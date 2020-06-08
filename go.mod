@@ -1,0 +1,22 @@
+module github.com/darwinia-network/link
+
+go 1.12
+
+require (
+	cloud.google.com/go v0.43.0 // indirect
+	github.com/garyburd/redigo v1.6.0
+	github.com/gin-contrib/sse v0.1.0 // indirect
+	github.com/gin-gonic/gin v1.4.0
+	github.com/go-sql-driver/mysql v1.4.1
+	github.com/google/go-cmp v0.3.1 // indirect
+	github.com/huandu/xstrings v1.3.1
+	github.com/jinzhu/gorm v1.9.10
+	github.com/kr/pretty v0.2.0 // indirect
+	github.com/mattn/go-isatty v0.0.8 // indirect
+	github.com/shopspring/decimal v1.2.0
+	github.com/stretchr/testify v1.4.0 // indirect
+	github.com/ugorji/go v1.1.7 // indirect
+	golang.org/x/crypto v0.0.0-20200311171314-f7b00557c8c4 // indirect
+	golang.org/x/net v0.0.0-20200425230154-ff2c4b7c35a0 // indirect
+	gopkg.in/urfave/cli.v2 v2.0.0-20180128182452-d3ae77c26ac8
+)

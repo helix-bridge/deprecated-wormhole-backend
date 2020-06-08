@@ -1,0 +1,20 @@
+version: "2.4"
+
+services:
+  darwinia-link:
+    image: darwinia/link
+    build: .
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PASS: 'helloload'
+      MYSQL_DB: 'darwinia-dapp'
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - '5333:5333'
+    networks:
+      - app_net
+
+networks:
+  app_net:
+    external: true

@@ -1,0 +1,9 @@
+{
+  "WorkingDir": ".",
+  "SourceExt": [
+    ".go",
+    ".toml"
+  ],
+  "BuildCmd": "go build .",
+  "RunCmd": "./link"
+}
