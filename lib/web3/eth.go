@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/darwinia-network/link/util"
 	"github.com/darwinia-network/link/util/crypto"
+	"net/url"
 	"strings"
 )
 
@@ -25,7 +26,7 @@ type TransactionParameters struct {
 }
 
 func (e *eth) url() string {
-	return "https://mainnet.infura.io/v3/1bb85682d6494e219803bab49a4813dc"
+	return fmt.Sprintf("https://mainnet.infura.io/v3/%s", util.GetEnv("INFURA", "1bb85682d6494e219803bab49a4813dc"))
 }
 
 func (e *eth) Call(v interface{}, contract, method string, params ...string) error {
@@ -36,7 +37,6 @@ func (e *eth) Call(v interface{}, contract, method string, params ...string) err
 		Data: util.AddHex(sha3Function[0:10] + strings.Join(params, "")),
 	}
 	body[1] = "latest"
-	fmt.Println(body[0])
 	r := ReqBody{
 		JSONRPC: "2.0",
 		Method:  "eth_call",
@@ -48,6 +48,22 @@ func (e *eth) Call(v interface{}, contract, method string, params ...string) err
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response), string(j))
+	return json.Unmarshal(response, v)
+}
+
+func (e *eth) Event(v interface{}, start int64, address, topic string) error {
+	etherscan := "https://api-ropsten.etherscan.io/api?module=logs&action=getLogs&"
+	q := url.Values{}
+	q.Add("fromBlock", util.Int64ToString(start))
+	q.Add("toBlock", "latest")
+	q.Add("address", address)
+	q.Add("topic0", topic)
+	q.Add("apikey", util.GetEnv("ETHSCAN_KEY", "MXI2JMCCD1WS312SM98BUSB927BND7UWWN"))
+	fmt.Println(fmt.Sprintf("%s%s", etherscan, q.Encode()))
+	response, err := util.HttpGet(fmt.Sprintf("%s?%s", etherscan, q.Encode()))
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(response))
 	return json.Unmarshal(response, v)
 }

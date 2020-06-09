@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -15,7 +16,7 @@ func PostWithJson(url string, body io.Reader) ([]byte, error) {
 		return nil, err
 	}
 	if resp.Body == nil {
-		return nil, nil
+		return nil, fmt.Errorf("empty response")
 	}
 	defer resp.Body.Close()
 	r, err := ioutil.ReadAll(resp.Body)
@@ -30,7 +31,7 @@ func HttpGet(url string) ([]byte, error) {
 		return nil, err
 	}
 	if resp.Body == nil {
-		return nil, nil
+		return nil, fmt.Errorf("empty response")
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)

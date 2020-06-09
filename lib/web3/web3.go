@@ -3,6 +3,7 @@ package web3
 type Web3 interface {
 	Call(v interface{}, contract, method string, params ...string) error
 	url() string
+	Event(v interface{}, start int64, address, topic string) error
 }
 
 type web3 struct{}
@@ -27,4 +28,8 @@ func (w3 *web3) Call(v interface{}, contract, method string, params ...string) e
 
 func (w3 *web3) url() string {
 	return ""
+}
+
+func (w3 *web3) Event(v interface{}, start int64, address, topic string) error {
+	return nil
 }

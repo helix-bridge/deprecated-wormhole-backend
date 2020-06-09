@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/darwinia-network/link/middlewares"
+	"github.com/darwinia-network/link/observer"
 	serverHttp "github.com/darwinia-network/link/server/routes/http"
 	"github.com/darwinia-network/link/util"
 	"github.com/gin-gonic/gin"
@@ -34,9 +35,10 @@ func setupApp() *cli.App {
 		},
 		Commands: []*cli.Command{
 			{
-				Name: "run",
+				Name: "observer",
 				Action: func(c *cli.Context) error {
-					fmt.Println("run")
+					observer.Run()
+					util.RunForever()
 					return nil
 				},
 			},

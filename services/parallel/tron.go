@@ -1,4 +1,4 @@
-package contract
+package parallel
 
 import (
 	"github.com/darwinia-network/link/lib/web3"
@@ -17,4 +17,17 @@ func RingTronSupply() *big.Int {
 	var e TronResponse
 	_ = w.Call(&e, tronContract, "totalSupply()")
 	return util.U256(e.ConstantResult[0])
+}
+
+type TronScan struct {
+	Result []interface{} `json:"result"`
+}
+
+func TronScanLog(start int64, address, method string) (*TronScan, error) {
+	w := web3.New("tron")
+	var e TronScan
+	if err := w.Event(&e, start, address, ""); err != nil {
+		return nil, err
+	}
+	return &e, nil
 }

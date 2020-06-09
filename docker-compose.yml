@@ -10,6 +10,9 @@ services:
       MYSQL_DB: 'darwinia-dapp'
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      ETHSCAN_KEY: 'MXI2JMCCD1WS312SM98BUSB927BND7UWWN'
+      INFURA: '1bb85682d6494e219803bab49a4813dc'
+      GIN_MODE: 'release'
     ports:
       - '5333:5333'
     networks:

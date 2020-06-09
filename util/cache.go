@@ -7,7 +7,7 @@ import (
 )
 
 var cacheKey = func(key string) string {
-	return fmt.Sprintf("live:%s", key)
+	return fmt.Sprintf("link:%s", key)
 }
 
 func SetCache(key string, value interface{}, ttl int) (err error) {
