@@ -10,7 +10,7 @@ func StringToInt(s string) int {
 }
 
 func StringToInt64(s string) int64 {
-	if i, err := strconv.ParseInt(s, 10, 64); err != nil {
+	if i, err := strconv.ParseInt(s, 10, 64); err == nil {
 		return i
 	}
 	return 0

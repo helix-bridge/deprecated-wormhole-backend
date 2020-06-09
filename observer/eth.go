@@ -20,8 +20,9 @@ func (e *EthTransaction) Do(o Observable) error {
 }
 
 func (e *EthTransaction) Listen(o Observable) error {
+	key := runFuncName()
 	if e.Last == 0 {
-		if b := util.GetCache(runFuncName()); b != nil {
+		if b := util.GetCache(key); b != nil {
 			e.Last = util.StringToInt64(string(b))
 		} else {
 			e.Last = 8028174
@@ -29,14 +30,14 @@ func (e *EthTransaction) Listen(o Observable) error {
 	}
 	go func() {
 		for {
-			if eventLog, _ := parallel.EtherscanLog(e.Last, e.Address, e.Method); eventLog != nil {
+			if eventLog, _ := parallel.EtherscanLog(e.Last+1, e.Address, e.Method); eventLog != nil {
 				for _, result := range eventLog.Result {
 					e.Last = util.U256(result.BlockNumber).Int64()
 					e.Result = &result
 					_ = o.notify(e)
 				}
 			}
-			_ = util.SetCache(runFuncName(), e.Last, 86400*7)
+			_ = util.SetCache(key, e.Last, 86400*7)
 			time.Sleep(10 * time.Second)
 		}
 	}()

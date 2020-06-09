@@ -6,7 +6,6 @@ import (
 	"github.com/darwinia-network/link/util"
 	"net/url"
 	"strings"
-	"time"
 )
 
 type tron struct {
@@ -32,20 +31,17 @@ func (e *tron) Call(v interface{}, contract, method string, params ...string) er
 	return json.Unmarshal(response, v)
 }
 
-// address=TSbJFbH8sSayRFMavwohY2P6QfKwQEWcaz&start=0&limit=200&start_timestamp=1548000000000&end_timestamp=1548056638507
 func (e *tron) Event(v interface{}, start int64, address, topic string) error {
-	etherscan := "https://api.shasta.tronscan.org/api/contract/events?"
+	trongrid := fmt.Sprintf("https://api.shasta.trongrid.io/v1/contracts/%s/events?", address)
 	q := url.Values{}
-	q.Add("address", address)
-	q.Add("start", "0")
-	q.Add("limit", "200")
-	q.Add("start_timestamp", util.Int64ToString(start*1000))
-	q.Add("end_timestamp", util.Int64ToString(time.Now().Unix()*1000))
-	fmt.Println(fmt.Sprintf("%s%s", etherscan, q.Encode()))
-	response, err := util.HttpGet(fmt.Sprintf("%s?%s", etherscan, q.Encode()))
+	q.Add("only_confirmed", "true")
+	q.Add("order_by", "block_timestamp,desc")
+	q.Add("min_block_timestamp", util.Int64ToString(start*1000))
+
+	response, err := util.HttpGet(fmt.Sprintf("%s?%s", trongrid, q.Encode()))
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+
 	return json.Unmarshal(response, v)
 }

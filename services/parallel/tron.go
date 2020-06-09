@@ -20,13 +20,20 @@ func RingTronSupply() *big.Int {
 }
 
 type TronScan struct {
-	Result []interface{} `json:"result"`
+	Success bool             `json:"success"`
+	Data    []TronScanResult `json:"data"`
 }
 
-func TronScanLog(start int64, address, method string) (*TronScan, error) {
+type TronScanResult struct {
+	TransactionId string            `json:"transaction_id"`
+	EventName     string            `json:"event_name"`
+	Result        map[string]string `json:"result"`
+}
+
+func TronScanLog(start int64, address string) (*TronScan, error) {
 	w := web3.New("tron")
 	var e TronScan
-	if err := w.Event(&e, start, address, ""); err != nil {
+	if err := w.Event(&e, start, address, ""); err != nil || !e.Success {
 		return nil, err
 	}
 	return &e, nil

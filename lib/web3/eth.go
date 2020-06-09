@@ -58,12 +58,11 @@ func (e *eth) Event(v interface{}, start int64, address, topic string) error {
 	q.Add("toBlock", "latest")
 	q.Add("address", address)
 	q.Add("topic0", topic)
-	q.Add("apikey", util.GetEnv("ETHSCAN_KEY", "MXI2JMCCD1WS312SM98BUSB927BND7UWWN"))
+	q.Add("apikey", util.GetEnv("ETHSCAN_KEY", "G78R6SGMHGXSMXZCBDW8WE716YQFQGJ68F"))
 	fmt.Println(fmt.Sprintf("%s%s", etherscan, q.Encode()))
 	response, err := util.HttpGet(fmt.Sprintf("%s?%s", etherscan, q.Encode()))
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
 	return json.Unmarshal(response, v)
 }

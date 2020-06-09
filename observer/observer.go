@@ -45,6 +45,7 @@ func (o *ObservableConcrete) Run() (err error) {
 func Run() {
 	subject := &ObservableConcrete{}
 	subject.Attach(&EthTransaction{Address: "0xb88141E0B8702f9bcFd8063c2Ac8852771525c4e", Method: "RingBuildInEvent(address,address,uint256,bytes)"})
+	subject.Attach(&TronTransaction{Address: "TDhG8mcJnmRC3oFkn6YoEFtapwv4Z6rNmN", Method: "RingBuildInEvent"})
 	_ = subject.Run()
 }
 

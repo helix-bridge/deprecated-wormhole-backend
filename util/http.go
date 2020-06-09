@@ -25,7 +25,7 @@ func PostWithJson(url string, body io.Reader) ([]byte, error) {
 
 func HttpGet(url string) ([]byte, error) {
 	client := &http.Client{}
-	req, _ := http.NewRequest("Get", url, nil)
+	req, _ := http.NewRequest("GET", url, nil)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
