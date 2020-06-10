@@ -33,7 +33,7 @@ type TronScanResult struct {
 func TronScanLog(start int64, address string) (*TronScan, error) {
 	w := web3.New("tron")
 	var e TronScan
-	if err := w.Event(&e, start, address, ""); err != nil || !e.Success {
+	if err := w.Event(&e, start, address); err != nil || !e.Success {
 		return nil, err
 	}
 	return &e, nil

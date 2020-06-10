@@ -40,3 +40,13 @@ func U256(v string) *big.Int {
 	n, _ := bn.SetString(v, 16)
 	return n
 }
+
+func LogAnalysis(log string) []string {
+	log = strings.TrimPrefix(log, "0x")
+	logLength := len(log)
+	var logSlice []string
+	for i := 0; i < logLength/64; i++ {
+		logSlice = append(logSlice, log[i*64:(i+1)*64])
+	}
+	return logSlice
+}

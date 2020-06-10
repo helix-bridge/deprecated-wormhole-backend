@@ -31,13 +31,13 @@ func (e *tron) Call(v interface{}, contract, method string, params ...string) er
 	return json.Unmarshal(response, v)
 }
 
-func (e *tron) Event(v interface{}, start int64, address, topic string) error {
+func (e *tron) Event(v interface{}, start int64, address string, topic ...string) error {
 	trongrid := fmt.Sprintf("https://api.shasta.trongrid.io/v1/contracts/%s/events?", address)
 	q := url.Values{}
 	q.Add("only_confirmed", "true")
 	q.Add("order_by", "block_timestamp,desc")
 	q.Add("min_block_timestamp", util.Int64ToString(start*1000))
-
+	fmt.Println(fmt.Sprintf("%s%s", trongrid, q.Encode()))
 	response, err := util.HttpGet(fmt.Sprintf("%s?%s", trongrid, q.Encode()))
 	if err != nil {
 		return err
