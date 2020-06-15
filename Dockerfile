@@ -12,7 +12,7 @@ FROM buildpack-deps:buster-scm
 
 WORKDIR /app
 
-COPY --from=builder go/src/github.com/darwinia-network/link /app/link
+COPY --from=builder go/src/github.com/darwinia-network/link/link /app/link
 
 EXPOSE 5333
 
