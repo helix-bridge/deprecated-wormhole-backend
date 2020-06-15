@@ -21,7 +21,7 @@ services:
     <<: *app_base
     image: darwinia/link
     ports: []
-    command: ["link","observer"]
+    command: ["/app/link","observer"]
 networks:
   app_net:
     external: true
