@@ -14,13 +14,20 @@ type RingBurnRecord struct {
 	Address   string          `json:"address" sql:"size:100"`
 	Target    string          `json:"target" sql:"size:100"`
 	Currency  string          `json:"currency"`
+	BlockNum  int             `json:"block_num"`
 	Amount    decimal.Decimal `json:"amount" sql:"type:decimal(40,0);" `
 }
 
-func AddRingBurnRecord(chain, tx, address, target, currency string, amount decimal.Decimal) error {
+func AddRingBurnRecord(chain, tx, address, target, currency string, amount decimal.Decimal, blockNum int) error {
 	db := util.DB
 	query := db.Create(&RingBurnRecord{
-		Chain: chain, Tx: tx, Address: address, Target: target, Amount: amount, Currency: currency,
+		Chain: chain, Tx: tx, Address: address, Target: target, Amount: amount, Currency: currency, BlockNum: blockNum,
 	})
 	return query.Error
+}
+
+func RingBurnList(address string) (list []RingBurnRecord) {
+	db := util.DB
+	db.Model(list).Where("address = ?", address).Order("block_num desc").Find(&list)
+	return
 }

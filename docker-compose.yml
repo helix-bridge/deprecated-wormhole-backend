@@ -1,7 +1,7 @@
 version: "2.4"
 
 services:
-  darwinia-link:
+  darwinia-link: &app_base
     image: darwinia/link
     build: .
     environment:
@@ -17,7 +17,11 @@ services:
       - '5333:5333'
     networks:
       - app_net
-
+  darwinia-link-daemon:
+    <<: *app_base
+    image: darwinia/link
+    ports: []
+    command: ["link","observer"]
 networks:
   app_net:
     external: true

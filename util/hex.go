@@ -30,6 +30,16 @@ func AddHex(s string) string {
 	return strings.ToLower("0x" + s)
 }
 
+func AddTronPerfix(s string) string {
+	if strings.TrimSpace(s) == "" {
+		return ""
+	}
+	if strings.HasPrefix(s, "41") {
+		return s
+	}
+	return strings.ToLower("41" + s)
+}
+
 func TrimHex(s string) string {
 	return strings.TrimPrefix(s, "0x")
 }

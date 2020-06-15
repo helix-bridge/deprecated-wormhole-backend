@@ -61,5 +61,5 @@ func (e *TronTransaction) RingBurnRecord() error {
 		currency = kton
 	}
 
-	return db.AddRingBurnRecord(Tron, util.AddHex(e.Result.TransactionId), address, target, currency, amount)
+	return db.AddRingBurnRecord(Tron, util.AddHex(e.Result.TransactionId), util.AddTronPerfix(address), target, currency, amount, e.Result.BlockNumber)
 }

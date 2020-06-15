@@ -6,6 +6,7 @@ import (
 
 func Run(api *gin.RouterGroup) {
 	api.GET("supply", supply())
+	api.GET("ringBurn", ringBurn())
 }
 
 func JsonFormat(data interface{}, code int) map[string]interface{} {
@@ -18,5 +19,6 @@ func JsonFormat(data interface{}, code int) map[string]interface{} {
 }
 
 var responseCode = map[int]string{
-	0: "ok",
+	0:    "ok",
+	1001: "params error",
 }

@@ -28,6 +28,7 @@ type TronScanResult struct {
 	TransactionId string            `json:"transaction_id"`
 	EventName     string            `json:"event_name"`
 	Result        map[string]string `json:"result"`
+	BlockNumber   int               `json:"block_number"`
 }
 
 func TronScanLog(start int64, address string) (*TronScan, error) {

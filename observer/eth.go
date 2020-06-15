@@ -68,5 +68,5 @@ func (e *EthTransaction) RingBurnRecord() error {
 		currency = kton
 	}
 
-	return db.AddRingBurnRecord(Eth, util.AddHex(e.Result.TransactionHash), address, target, currency, amount)
+	return db.AddRingBurnRecord(Eth, util.AddHex(e.Result.TransactionHash), address, target, currency, amount, int(util.U256(e.Result.BlockNumber).Int64()))
 }
