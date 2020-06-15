@@ -1,14 +1,10 @@
 FROM golang:1.12.4 as builder
 
-WORKDIR /app
+COPY . /go/src/github.com/darwinia-network/link
 
-COPY go.mod .
+ENV GO111MODULE=off
 
-COPY go.sum .
-
-RUN go mod download
-
-COPY . /app
+WORKDIR /go/src/github.com/darwinia-network/link
 
 RUN go build -o link
 
@@ -16,7 +12,7 @@ FROM buildpack-deps:buster-scm
 
 WORKDIR /app
 
-COPY --from=builder /app/link /app/link
+COPY --from=builder go/src/github.com/darwinia-network/link /app/link
 
 EXPOSE 5333
 
