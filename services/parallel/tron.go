@@ -25,10 +25,11 @@ type TronScan struct {
 }
 
 type TronScanResult struct {
-	TransactionId string            `json:"transaction_id"`
-	EventName     string            `json:"event_name"`
-	Result        map[string]string `json:"result"`
-	BlockNumber   int               `json:"block_number"`
+	TransactionId  string            `json:"transaction_id"`
+	EventName      string            `json:"event_name"`
+	Result         map[string]string `json:"result"`
+	BlockNumber    int               `json:"block_number"`
+	BlockTimestamp int64             `json:"block_timestamp"`
 }
 
 func TronScanLog(start int64, address string) (*TronScan, error) {

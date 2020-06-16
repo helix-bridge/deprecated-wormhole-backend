@@ -7,21 +7,23 @@ import (
 )
 
 type RingBurnRecord struct {
-	ID        uint            `gorm:"primary_key" json:"id"`
-	CreatedAt time.Time       `json:"created_at"`
-	Chain     string          `json:"chain"`
-	Tx        string          `json:"tx" sql:"size:100"`
-	Address   string          `json:"address" sql:"size:100"`
-	Target    string          `json:"target" sql:"size:100"`
-	Currency  string          `json:"currency"`
-	BlockNum  int             `json:"block_num"`
-	Amount    decimal.Decimal `json:"amount" sql:"type:decimal(40,0);" `
+	ID             uint            `gorm:"primary_key" json:"id"`
+	CreatedAt      time.Time       `json:"created_at"`
+	Chain          string          `json:"chain"`
+	Tx             string          `json:"tx" sql:"size:100"`
+	Address        string          `json:"address" sql:"size:100"`
+	Target         string          `json:"target" sql:"size:100"`
+	Currency       string          `json:"currency"`
+	BlockNum       int             `json:"block_num"`
+	Amount         decimal.Decimal `json:"amount" sql:"type:decimal(40,0);" `
+	BlockTimestamp int             `json:"block_timestamp"`
 }
 
-func AddRingBurnRecord(chain, tx, address, target, currency string, amount decimal.Decimal, blockNum int) error {
+func AddRingBurnRecord(chain, tx, address, target, currency string, amount decimal.Decimal, blockNum, blockTimestamp int) error {
 	db := util.DB
 	query := db.Create(&RingBurnRecord{
 		Chain: chain, Tx: tx, Address: address, Target: target, Amount: amount, Currency: currency, BlockNum: blockNum,
+		BlockTimestamp: blockTimestamp,
 	})
 	return query.Error
 }

@@ -28,6 +28,7 @@ type EtherscanResult struct {
 	Data            string   `json:"data"`
 	TransactionHash string   `json:"transactionHash"`
 	BlockNumber     string   `json:"blockNumber"`
+	TimeStamp       string   `json:"timeStamp"`
 }
 
 func RingEthSupply() *big.Int {
