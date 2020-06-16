@@ -44,6 +44,10 @@ func TrimHex(s string) string {
 	return strings.TrimPrefix(s, "0x")
 }
 
+func TrimTronHex(s string) string {
+	return strings.TrimPrefix(s, "41")
+}
+
 func U256(v string) *big.Int {
 	v = strings.TrimPrefix(v, "0x")
 	bn := new(big.Int)

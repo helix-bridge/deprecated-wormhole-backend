@@ -7,7 +7,6 @@ import (
 	"github.com/darwinia-network/link/util"
 	"github.com/darwinia-network/link/util/crypto"
 	"net/url"
-	"strings"
 )
 
 type eth struct {
@@ -30,11 +29,15 @@ func (e *eth) url() string {
 }
 
 func (e *eth) Call(v interface{}, contract, method string, params ...string) error {
-	sha3Function := util.BytesToHex(crypto.SoliditySHA3(crypto.String(method)))
+	sha3Function := util.AddHex(util.BytesToHex(crypto.SoliditySHA3(crypto.String(method))))
 	body := make([]interface{}, 2)
+	var data string
+	for _, param := range params {
+		data = data + util.Padding(param)
+	}
 	body[0] = TransactionParameters{
 		To:   contract,
-		Data: util.AddHex(sha3Function[0:10] + strings.Join(params, "")),
+		Data: sha3Function[0:10] + data,
 	}
 	body[1] = "latest"
 	r := ReqBody{

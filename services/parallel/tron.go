@@ -15,8 +15,19 @@ type TronResponse struct {
 func RingTronSupply() *big.Int {
 	w := web3.New("tron")
 	var e TronResponse
-	_ = w.Call(&e, tronContract, "totalSupply()")
-	return util.U256(e.ConstantResult[0])
+	if _ = w.Call(&e, tronContract, "totalSupply()"); len(e.ConstantResult) > 0 {
+		return util.U256(e.ConstantResult[0])
+	}
+	return big.NewInt(0)
+}
+
+func RingTronBalance(address string) *big.Int {
+	w := web3.New("tron")
+	var e TronResponse
+	if _ = w.Call(&e, tronContract, "balanceOf(address)", util.TrimTronHex(address)); len(e.ConstantResult) > 0 {
+		return util.U256(e.ConstantResult[0])
+	}
+	return big.NewInt(0)
 }
 
 type TronScan struct {

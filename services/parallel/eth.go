@@ -38,6 +38,13 @@ func RingEthSupply() *big.Int {
 	return util.U256(e.Result)
 }
 
+func RingEthBalance(address string) *big.Int {
+	w := web3.New("eth")
+	var e EthResponse
+	_ = w.Call(&e, ethContract, "balanceOf(address)", util.TrimHex(address))
+	return util.U256(e.Result)
+}
+
 func EtherscanLog(start int64, address string, methods ...string) (*Etherscan, error) {
 	w := web3.New("eth")
 	var e Etherscan
