@@ -19,7 +19,6 @@ type SupplyDetail struct {
 	Network           string          `json:"network"`
 	CirculatingSupply decimal.Decimal `json:"circulatingSupply"`
 	TotalSupply       decimal.Decimal `json:"totalSupply"`
-	MaxSupply         decimal.Decimal `json:"maxSupply"`
 	Precision         int             `json:"precision"`
 	Type              string          `json:"type,omitempty"`
 	Contract          string          `json:"contract,omitempty"`
@@ -61,7 +60,6 @@ func ethSupply() *SupplyDetail {
 	supply.Network = "Ethereum"
 	supply.CirculatingSupply = capDecimal.Sub(supply.filterBalance().Div(precision))
 	supply.TotalSupply = capDecimal
-	supply.MaxSupply = capDecimal
 	supply.Type = "erc20"
 	supply.Contract = "0x9469d013805bffb7d3debe5e7839237e535ec483"
 
@@ -77,7 +75,6 @@ func tronSupply() *SupplyDetail {
 	supply.Network = "Tron"
 	supply.CirculatingSupply = capDecimal.Sub(supply.filterBalance().Div(precision))
 	supply.TotalSupply = capDecimal
-	supply.MaxSupply = capDecimal
 	supply.Type = "trc20"
 	supply.Contract = "TL175uyihLqQD656aFx3uhHYe1tyGkmXaW"
 
