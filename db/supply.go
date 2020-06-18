@@ -25,16 +25,29 @@ type SupplyDetail struct {
 	Contract          string          `json:"contract,omitempty"`
 }
 
+// todo，need cache here
 func CurrencySupply() *Supply {
 	var supply Supply
 	supply.MaxSupply = decimal.New(1, 12) // 10 billion
+	wg := sync.WaitGroup{}
 
-	ethSupply := ethSupply()
-	tronSupply := tronSupply()
-
-	supply.TotalSupply = ethSupply.TotalSupply.Add(tronSupply.TotalSupply)
-	supply.CirculatingSupply = ethSupply.CirculatingSupply.Add(tronSupply.CirculatingSupply)
-	supply.Details = []*SupplyDetail{ethSupply, tronSupply}
+	go func() {
+		ethSupply := ethSupply()
+		supply.TotalSupply = supply.TotalSupply.Add(ethSupply.TotalSupply)
+		supply.CirculatingSupply = supply.CirculatingSupply.Add(ethSupply.CirculatingSupply)
+		supply.Details = append(supply.Details, ethSupply)
+		wg.Done()
+	}()
+	wg.Add(1)
+	go func() {
+		tronSupply := tronSupply()
+		supply.TotalSupply = supply.TotalSupply.Add(tronSupply.TotalSupply)
+		supply.CirculatingSupply = supply.CirculatingSupply.Add(tronSupply.CirculatingSupply)
+		supply.Details = append(supply.Details, tronSupply)
+		wg.Done()
+	}()
+	wg.Add(1)
+	wg.Wait()
 
 	return &supply
 }
