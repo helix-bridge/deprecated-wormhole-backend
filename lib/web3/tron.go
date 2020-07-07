@@ -15,6 +15,10 @@ func (e *tron) url() string {
 	return "https://api.trongrid.io"
 }
 
+func (e *tron) scan() string {
+	return util.GetEnv("TRONSCAN", "https://api.shasta.trongrid.io")
+}
+
 func (e *tron) Call(v interface{}, contract, method string, params ...string) error {
 	body := fmt.Sprintf("{\"contract_address\":\"%s\",\"function_selector\":\"%s\",\"fee_limit\":%d,\"call_value\":%d,\"owner_address\":\"%s\",\"parameter\":\"",
 		contract, method, 0, 0, contract)
@@ -32,7 +36,7 @@ func (e *tron) Call(v interface{}, contract, method string, params ...string) er
 }
 
 func (e *tron) Event(v interface{}, start int64, address string, topic ...string) error {
-	trongrid := fmt.Sprintf("https://api.shasta.trongrid.io/v1/contracts/%s/events?", address)
+	trongrid := fmt.Sprintf("%s/v1/contracts/%s/events?", e.scan(), address)
 	q := url.Values{}
 	q.Add("only_confirmed", "true")
 	q.Add("order_by", "block_timestamp,desc")

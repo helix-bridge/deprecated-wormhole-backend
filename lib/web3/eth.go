@@ -28,6 +28,10 @@ func (e *eth) url() string {
 	return fmt.Sprintf("https://mainnet.infura.io/v3/%s", util.GetEnv("INFURA", "1bb85682d6494e219803bab49a4813dc"))
 }
 
+func (e *eth) scan() string {
+	return fmt.Sprintf("%s/api?module=logs&action=getLogs&", util.GetEnv("ETHERSCAN", "https://api-ropsten.etherscan.io"))
+}
+
 func (e *eth) Call(v interface{}, contract, method string, params ...string) error {
 	sha3Function := util.AddHex(util.BytesToHex(crypto.SoliditySHA3(crypto.String(method))))
 	body := make([]interface{}, 2)
@@ -59,7 +63,7 @@ func (e *eth) Event(v interface{}, start int64, address string, topic ...string)
 	if len(topic) < 1 {
 		return fmt.Errorf("need at least one topic")
 	}
-	etherscan := "https://api-ropsten.etherscan.io/api?module=logs&action=getLogs&"
+	etherscan := e.scan()
 	q := url.Values{}
 	q.Add("fromBlock", util.Int64ToString(start))
 	q.Add("toBlock", "latest")

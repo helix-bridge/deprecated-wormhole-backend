@@ -13,6 +13,8 @@ services:
       ETHSCAN_KEY: 'G78R6SGMHGXSMXZCBDW8WE716YQFQGJ68F'
       INFURA: '1bb85682d6494e219803bab49a4813dc'
       GIN_MODE: 'release'
+#      TRONSCAN: 'https://api.trongrid.io'
+#      ETHERSCAN: 'https://api.etherscan.io'
     ports:
       - '5333:5333'
     networks:
