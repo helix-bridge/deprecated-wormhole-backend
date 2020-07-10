@@ -1,6 +1,9 @@
 package observer
 
-import "runtime"
+import (
+	"github.com/darwinia-network/link/config"
+	"runtime"
+)
 
 type Observable interface {
 	Attach(observer ...IObserver) Observable
@@ -45,11 +48,11 @@ func (o *ObservableConcrete) Run() (err error) {
 func Run() {
 	subject := &ObservableConcrete{}
 	subject.Attach(&EthTransaction{
-		Address: "0xb88141E0B8702f9bcFd8063c2Ac8852771525c4e",
+		Address: config.Link.EthRingBurn,
 		Method:  []string{"RingBuildInEvent(address,address,uint256,bytes)", "KtonBuildInEvent(address,address,uint256,bytes)"},
 	})
 	subject.Attach(&TronTransaction{
-		Address: "TDhG8mcJnmRC3oFkn6YoEFtapwv4Z6rNmN",
+		Address: config.Link.TronRingBurn,
 		Method:  []string{"RingBuildInEvent", "KtonBuildInEvent"},
 	})
 	_ = subject.Run()

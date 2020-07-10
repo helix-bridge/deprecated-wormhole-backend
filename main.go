@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/darwinia-network/link/config"
 	"github.com/darwinia-network/link/middlewares"
 	"github.com/darwinia-network/link/observer"
 	serverHttp "github.com/darwinia-network/link/server/routes/http"
@@ -27,6 +28,7 @@ func setupApp() *cli.App {
 		Version: "0.1",
 		Before: func(context *cli.Context) error {
 			runtime.GOMAXPROCS(runtime.NumCPU())
+			config.LoadConf()
 			return nil
 		},
 		Action: func(c *cli.Context) error {

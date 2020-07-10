@@ -3,7 +3,6 @@ module github.com/darwinia-network/link
 go 1.12
 
 require (
-	cloud.google.com/go v0.43.0 // indirect
 	github.com/garyburd/redigo v1.6.0
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.4.0
@@ -14,9 +13,11 @@ require (
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.8 // indirect
 	github.com/shopspring/decimal v1.2.0
+	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.4.0 // indirect
 	github.com/ugorji/go v1.1.7 // indirect
 	golang.org/x/crypto v0.0.0-20200311171314-f7b00557c8c4 // indirect
 	golang.org/x/net v0.0.0-20200425230154-ff2c4b7c35a0 // indirect
 	gopkg.in/urfave/cli.v2 v2.0.0-20180128182452-d3ae77c26ac8
+	rsc.io/binaryregexp v0.2.0 // indirect
 )
