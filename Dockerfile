@@ -1,27 +1,20 @@
-FROM golang:1.12.4 as builder
+ARG GO_VERSION=1.12.4
 
-COPY . /go/src/github.com/darwinia-network/link
-
-ENV GO111MODULE=off
-
+FROM golang:${GO_VERSION} as builder
 WORKDIR /go/src/github.com/darwinia-network/link
 
-RUN go build -o link
+ENV GO111MODULE=off
+# COPY go.mod go.sum ./
+# RUN go get -v ./...
+
+COPY . .
+RUN go build -o /link
 
 FROM buildpack-deps:buster-scm
 
 WORKDIR /app
-
-COPY --from=builder go/src/github.com/darwinia-network/link/link /app/link
+COPY ./config ./config
+COPY --from=builder /link ./link
 
 EXPOSE 5333
-
-ENV TINI_VERSION v0.19.0
-
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-
-RUN chmod +x /tini
-
-ENTRYPOINT ["/tini", "--"]
-
 CMD ["/app/link"]
