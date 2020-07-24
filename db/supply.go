@@ -27,7 +27,7 @@ type SupplyDetail struct {
 // todo，need cache here
 func CurrencySupply() *Supply {
 	var supply Supply
-	supply.MaxSupply = decimal.New(1, 11) // 10 billion
+	supply.MaxSupply = decimal.New(1, 10) // 10 billion
 	wg := sync.WaitGroup{}
 
 	go func() {
