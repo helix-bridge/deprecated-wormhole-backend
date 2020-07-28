@@ -5,7 +5,8 @@ import (
 )
 
 func Run(api *gin.RouterGroup) {
-	api.GET("supply", supply())
+	api.GET("supply", ringSupply())
+	api.GET("supply/kton", ktonSupply())
 	api.GET("ringBurn", ringBurn())
 	api.GET("/status", func(c *gin.Context) {
 		c.String(200, "OK")

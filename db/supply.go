@@ -24,14 +24,42 @@ type SupplyDetail struct {
 	Contract          string          `json:"contract,omitempty"`
 }
 
+type Currency struct {
+	EthContract   string
+	TronContract  string
+	MaxSupply     decimal.Decimal
+	FilterAddress map[string][]string
+}
+
+func RingSupply() *Supply {
+	ring := Currency{
+		EthContract:  "0x9469d013805bffb7d3debe5e7839237e535ec483",
+		TronContract: "TL175uyihLqQD656aFx3uhHYe1tyGkmXaW",
+		MaxSupply:    decimal.New(1, 10),
+	}
+	ring.FilterAddress = map[string][]string{
+		"Tron":     {"TDWzV6W1L1uRcJzgg2uKa992nAReuDojfQ", "TSu1fQKFkTv95U312R6E94RMdixsupBZDS", "TTW2Vpr9TCu6gxGZ1yjwqy7R79hEH8iscC"},
+		"Ethereum": {"0x4710573b853fdd3561cb4f60ec9394f0155d5105", "0x7f23e4a473db3d11d11b43d90b34f8a778753e34", "0x649fdf6ee483a96e020b889571e93700fbd82d88"},
+	}
+	return ring.supply()
+}
+
+func KtonSupply() *Supply {
+	ring := Currency{
+		EthContract:  "0x9f284e1337a815fe77d2ff4ae46544645b20c5ff",
+		TronContract: "TW3kTpVtYYQ5Ka1awZvLb9Yy6ZTDEC93dC",
+	}
+	return ring.supply()
+}
+
 // todo，need cache here
-func CurrencySupply() *Supply {
+func (c *Currency) supply() *Supply {
 	var supply Supply
-	supply.MaxSupply = decimal.New(1, 10) // 10 billion
+	supply.MaxSupply = c.MaxSupply // 10 billion
 	wg := sync.WaitGroup{}
 
 	go func() {
-		ethSupply := ethSupply()
+		ethSupply := c.ethSupply()
 		supply.TotalSupply = supply.TotalSupply.Add(ethSupply.TotalSupply)
 		supply.CirculatingSupply = supply.CirculatingSupply.Add(ethSupply.CirculatingSupply)
 		supply.Details = append(supply.Details, ethSupply)
@@ -39,7 +67,7 @@ func CurrencySupply() *Supply {
 	}()
 	wg.Add(1)
 	go func() {
-		tronSupply := tronSupply()
+		tronSupply := c.tronSupply()
 		supply.TotalSupply = supply.TotalSupply.Add(tronSupply.TotalSupply)
 		supply.CirculatingSupply = supply.CirculatingSupply.Add(tronSupply.CirculatingSupply)
 		supply.Details = append(supply.Details, tronSupply)
@@ -48,50 +76,46 @@ func CurrencySupply() *Supply {
 	wg.Add(1)
 	wg.Wait()
 
+	if supply.MaxSupply.IsZero() {
+		for _, one := range supply.Details {
+			supply.MaxSupply = supply.MaxSupply.Add(one.TotalSupply)
+		}
+	}
+
 	return &supply
 }
 
-func ethSupply() *SupplyDetail {
+func (c *Currency) ethSupply() *SupplyDetail {
 	var supply SupplyDetail
 	supply.Precision = 18
 	precision := decimal.New(1, int32(supply.Precision))
 
-	capDecimal := decimal.NewFromBigInt(parallel.RingEthSupply(), 0).Div(precision)
+	capDecimal := decimal.NewFromBigInt(parallel.RingEthSupply(c.EthContract), 0).Div(precision)
 	supply.Network = "Ethereum"
-	supply.CirculatingSupply = capDecimal.Sub(supply.filterBalance().Div(precision))
+	supply.Contract = c.EthContract
+	supply.CirculatingSupply = capDecimal.Sub(supply.filterBalance(c.FilterAddress).Div(precision))
 	supply.TotalSupply = capDecimal
 	supply.Type = "erc20"
-	supply.Contract = "0x9469d013805bffb7d3debe5e7839237e535ec483"
 
 	return &supply
 }
 
-func tronSupply() *SupplyDetail {
+func (c *Currency) tronSupply() *SupplyDetail {
 	var supply SupplyDetail
 	supply.Precision = 18
 	precision := decimal.New(1, int32(supply.Precision))
 
-	capDecimal := decimal.NewFromBigInt(parallel.RingTronSupply(), 0).Div(precision)
+	capDecimal := decimal.NewFromBigInt(parallel.RingTronSupply(c.TronContract), 0).Div(precision)
+	supply.Contract = c.TronContract
 	supply.Network = "Tron"
-	supply.CirculatingSupply = capDecimal.Sub(supply.filterBalance().Div(precision))
+	supply.CirculatingSupply = capDecimal.Sub(supply.filterBalance(c.FilterAddress).Div(precision))
 	supply.TotalSupply = capDecimal
 	supply.Type = "trc20"
-	supply.Contract = "TL175uyihLqQD656aFx3uhHYe1tyGkmXaW"
 
 	return &supply
 }
 
-func (s *SupplyDetail) filterBalance() decimal.Decimal {
-	var filterAddress = map[string][]string{
-		"Tron": {"TDWzV6W1L1uRcJzgg2uKa992nAReuDojfQ",
-			"TSu1fQKFkTv95U312R6E94RMdixsupBZDS",
-			"TTW2Vpr9TCu6gxGZ1yjwqy7R79hEH8iscC",
-		},
-		"Ethereum": {"0x4710573b853fdd3561cb4f60ec9394f0155d5105",
-			"0x7f23e4a473db3d11d11b43d90b34f8a778753e34",
-			"0x649fdf6ee483a96e020b889571e93700fbd82d88",
-		},
-	}
+func (s *SupplyDetail) filterBalance(filterAddress map[string][]string) decimal.Decimal {
 	filter := filterAddress[s.Network]
 	wg := sync.WaitGroup{}
 	var sum decimal.Decimal
@@ -100,9 +124,9 @@ func (s *SupplyDetail) filterBalance() decimal.Decimal {
 			defer wg.Done()
 			switch s.Network {
 			case "Tron":
-				sum = sum.Add(decimal.NewFromBigInt(parallel.RingTronBalance(util.TrxBase58toHexAddress(address)), 0))
+				sum = sum.Add(decimal.NewFromBigInt(parallel.RingTronBalance(s.Contract, util.TrxBase58toHexAddress(address)), 0))
 			case "Ethereum":
-				sum = sum.Add(decimal.NewFromBigInt(parallel.RingEthBalance(address), 0))
+				sum = sum.Add(decimal.NewFromBigInt(parallel.RingEthBalance(s.Contract, address), 0))
 				fmt.Println(sum, address)
 			}
 		}(address)

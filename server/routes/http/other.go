@@ -7,11 +7,14 @@ import (
 	"net/http"
 )
 
-func supply() gin.HandlerFunc {
+func ringSupply() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK,
-			JsonFormat(db.CurrencySupply(), 0),
-		)
+		c.JSON(http.StatusOK, JsonFormat(db.RingSupply(), 0))
+	}
+}
+func ktonSupply() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, JsonFormat(db.KtonSupply(), 0))
 	}
 }
 

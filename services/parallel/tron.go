@@ -1,30 +1,32 @@
 package parallel
 
 import (
+	"fmt"
 	"github.com/darwinia-network/link/lib/web3"
 	"github.com/darwinia-network/link/util"
 	"math/big"
 )
 
-var tronContract = "416e0d26adf5323f5b82d5714354dc3c6870adee7c"
+// var tronContract = "416e0d26adf5323f5b82d5714354dc3c6870adee7c"
 
 type TronResponse struct {
 	ConstantResult []string `json:"constant_result"`
 }
 
-func RingTronSupply() *big.Int {
+func RingTronSupply(contract string) *big.Int {
 	w := web3.New("tron")
 	var e TronResponse
-	if _ = w.Call(&e, tronContract, "totalSupply()"); len(e.ConstantResult) > 0 {
+
+	if _ = w.Call(&e, fmt.Sprintf(util.TrxBase58toHexAddress(contract)), "totalSupply()"); len(e.ConstantResult) > 0 {
 		return util.U256(e.ConstantResult[0])
 	}
 	return big.NewInt(0)
 }
 
-func RingTronBalance(address string) *big.Int {
+func RingTronBalance(contract, address string) *big.Int {
 	w := web3.New("tron")
 	var e TronResponse
-	if _ = w.Call(&e, tronContract, "balanceOf(address)", util.TrimTronHex(address)); len(e.ConstantResult) > 0 {
+	if _ = w.Call(&e, fmt.Sprintf( util.TrxBase58toHexAddress(contract)), "balanceOf(address)", util.TrimTronHex(address)); len(e.ConstantResult) > 0 {
 		return util.U256(e.ConstantResult[0])
 	}
 	return big.NewInt(0)
