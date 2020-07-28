@@ -51,6 +51,6 @@ func setupApp() *cli.App {
 func setupRouter() (server *gin.Engine) {
 	server = gin.Default()
 	server.Use(middlewares.CORS())
-	serverHttp.Run(server.Group("/api"))
+	serverHttp.Run(server)
 	return
 }

@@ -4,9 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Run(api *gin.RouterGroup) {
-	api.GET("supply", ringSupply())
-	api.GET("supply/kton", ktonSupply())
+func Run(server *gin.Engine) {
+	server.GET("supply", ringSupply())
+	server.GET("supply/kton", ktonSupply())
+	api := server.Group("/api")
 	api.GET("ringBurn", ringBurn())
 	api.GET("/status", func(c *gin.Context) {
 		c.String(200, "OK")
