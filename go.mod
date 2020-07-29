@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/garyburd/redigo v1.6.0
+	github.com/gin-contrib/cache v1.1.0
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-sql-driver/mysql v1.4.1

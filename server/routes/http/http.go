@@ -1,12 +1,18 @@
 package http
 
 import (
+	"github.com/gin-contrib/cache"
+	"github.com/gin-contrib/cache/persistence"
 	"github.com/gin-gonic/gin"
+	"time"
 )
 
 func Run(server *gin.Engine) {
-	server.GET("supply", ringSupply())
-	server.GET("supply/kton", ktonSupply())
+
+	store := persistence.NewInMemoryStore(time.Second)
+
+	server.GET("supply/ring", cache.CachePage(store, time.Minute, ringSupply()))
+	server.GET("supply/kton", cache.CachePage(store, time.Minute, ktonSupply()))
 	api := server.Group("/api")
 	api.GET("ringBurn", ringBurn())
 	api.GET("/status", func(c *gin.Context) {
