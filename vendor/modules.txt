@@ -1,8 +1,14 @@
+# github.com/bradfitz/gomemcache v0.0.0-20180710155616-bc664df96737
+github.com/bradfitz/gomemcache/memcache
 # github.com/fsnotify/fsnotify v1.4.7
 github.com/fsnotify/fsnotify
 # github.com/garyburd/redigo v1.6.0
 github.com/garyburd/redigo/redis
 github.com/garyburd/redigo/internal
+# github.com/gin-contrib/cache v1.1.0
+github.com/gin-contrib/cache
+github.com/gin-contrib/cache/persistence
+github.com/gin-contrib/cache/utils
 # github.com/gin-contrib/sse v0.1.0
 github.com/gin-contrib/sse
 # github.com/gin-gonic/gin v1.4.0
@@ -14,6 +20,9 @@ github.com/gin-gonic/gin/render
 github.com/go-sql-driver/mysql
 # github.com/golang/protobuf v1.3.2
 github.com/golang/protobuf/proto
+# github.com/gomodule/redigo v2.0.0+incompatible
+github.com/gomodule/redigo/redis
+github.com/gomodule/redigo/internal
 # github.com/hashicorp/hcl v1.0.0
 github.com/hashicorp/hcl
 github.com/hashicorp/hcl/hcl/printer
@@ -37,6 +46,8 @@ github.com/json-iterator/go
 github.com/magiconair/properties
 # github.com/mattn/go-isatty v0.0.8
 github.com/mattn/go-isatty
+# github.com/memcachier/mc v2.0.1+incompatible
+github.com/memcachier/mc
 # github.com/mitchellh/mapstructure v1.1.2
 github.com/mitchellh/mapstructure
 # github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
@@ -45,6 +56,8 @@ github.com/modern-go/concurrent
 github.com/modern-go/reflect2
 # github.com/pelletier/go-toml v1.2.0
 github.com/pelletier/go-toml
+# github.com/robfig/go-cache v0.0.0-20130306151617-9fc39e0dbf62
+github.com/robfig/go-cache
 # github.com/shopspring/decimal v1.2.0
 github.com/shopspring/decimal
 # github.com/spf13/afero v1.1.2
