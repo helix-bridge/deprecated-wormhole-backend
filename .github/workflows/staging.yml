@@ -1,15 +1,21 @@
 name: Staging
 on:
   push:
-    branches: ['master']
+    branches: [master, feature/github-actions]
     # tags: ['*']
 
 jobs:
   build-and-deploy:
     name: Build and Deploy
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          repository: itering/actions
+          path: .github/actions
+          persist-credentials: false
+          ssh-key: "${{ secrets.ITERING_ACTIONS_DEPLOY_KEY }}"
 
       - uses: docker/build-push-action@v1
         with:
@@ -18,26 +24,11 @@ jobs:
           registry: asia.gcr.io
           repository: ${{ secrets.GCR_PROJECT_ID }}/${{ github.repository }}
           add_git_labels: true
-          # cache_froms: asia.gcr.io/${{ secrets.GCR_PROJECT_ID }}/${{ github.repository }}:latest
-          # tags: latest
           tag_with_sha: true
           tag_with_ref: false # Do not tag on every individual branch
 
-      - name: Trigger deployment
-        env:
-          DEPLOY_PHASE: staging
-        run: |
-          export IMAGE_TAG=$(echo "sha-$GITHUB_SHA" | cut -c -11)
-          export DESCRIPTION="GitHub Actions Context:
-          * Run ID: ${{ github.run_id }}
-          * Commit: ${{ github.sha }}
-          * Ref: ${{ github.ref }}
-          "
-          curl -fsSL -o /dev/null -X POST \
-            -F "token=${{ secrets.ITERING_DEPLOYMENT_TRIGGER_TOKEN }}" \
-            -F "ref=master" \
-            -F "variables[DEPLOY_PHASE]=$DEPLOY_PHASE" \
-            -F "variables[DEPLOY_PROJECT]=${{ github.repository }}" \
-            -F "variables[DEPLOY_IMAGE_TAG]=$IMAGE_TAG" \
-            -F "variables[DEPLOY_DESCRIPTION]=$DESCRIPTION" \
-            "${{ secrets.ITERING_DEPLOYMENT_TRIGGER_ENDPOINT }}"
+      - uses: ./.github/actions/trigger-deployment
+        with:
+          deploy_phase: staging
+          trigger_token: ${{ secrets.ITERING_DEPLOYMENT_TRIGGER_TOKEN }}
+          trigger_endpoint: ${{ secrets.ITERING_DEPLOYMENT_TRIGGER_ENDPOINT }}
