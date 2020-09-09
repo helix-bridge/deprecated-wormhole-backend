@@ -42,7 +42,7 @@ func (e *TronTransaction) Listen(o Observable) error {
 						_ = o.notify(e)
 					}
 				}
-				e.Last = time.Now().Unix()
+				e.Last = time.Now().Unix() - 3600
 				_ = util.SetCache(key, e.Last, 86400*7)
 			}
 			time.Sleep(10 * time.Second)
