@@ -12,6 +12,7 @@ func Run(server *gin.Engine) {
 	store := persistence.NewInMemoryStore(time.Second)
 
 	server.GET("supply/ring", cache.CachePage(store, time.Minute, ringSupply()))
+	server.GET("supply", cache.CachePage(store, time.Minute, ringSupply()))
 	server.GET("supply/kton", cache.CachePage(store, time.Minute, ktonSupply()))
 	api := server.Group("/api")
 	api.GET("ringBurn", ringBurn())
