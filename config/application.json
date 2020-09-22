@@ -1,6 +1,6 @@
 {
   "production": {
-    "EthRingBurn": "0xb88141E0B8702f9bcFd8063c2Ac8852771525c4e",
+    "EthRingBurn": "0x7550aab5DFda37f646b1a826F27e9D604D8D1579",
     "TronRingBurn": "TDF92kbYFaEa8RAtvYKaeLwnhvULLHeiws"
   },
   "dev": {
