@@ -9,8 +9,10 @@ func init() {
 	if db != nil {
 		db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(
 			RingBurnRecord{},
+			Subscriber{},
 		)
 		db.Model(RingBurnRecord{}).AddUniqueIndex("tx", "tx")
 		db.Model(RingBurnRecord{}).AddIndex("address", "address")
+		db.Model(Subscriber{}).AddUniqueIndex("email", "email")
 	}
 }

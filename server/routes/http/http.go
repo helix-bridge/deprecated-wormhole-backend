@@ -19,6 +19,7 @@ func Run(server *gin.Engine) {
 	api.GET("/status", func(c *gin.Context) {
 		c.String(200, "OK")
 	})
+	api.POST("/subscribe", subscribe())
 }
 
 func JsonFormat(data interface{}, code int) map[string]interface{} {

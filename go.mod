@@ -11,6 +11,7 @@ require (
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/huandu/xstrings v1.3.1
 	github.com/jinzhu/gorm v1.9.10
+	github.com/jordan-wright/email v0.0.0-20200917010138-e1c00e156980
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.8 // indirect
 	github.com/shopspring/decimal v1.2.0
