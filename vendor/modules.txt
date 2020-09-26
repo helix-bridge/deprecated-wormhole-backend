@@ -40,6 +40,8 @@ github.com/huandu/xstrings
 github.com/jinzhu/gorm
 # github.com/jinzhu/inflection v1.0.0
 github.com/jinzhu/inflection
+# github.com/jordan-wright/email v0.0.0-20200917010138-e1c00e156980
+github.com/jordan-wright/email
 # github.com/json-iterator/go v1.1.6
 github.com/json-iterator/go
 # github.com/magiconair/properties v1.8.1
