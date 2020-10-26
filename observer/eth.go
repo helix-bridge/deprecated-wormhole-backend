@@ -3,6 +3,7 @@ package observer
 import (
 	"encoding/hex"
 	"fmt"
+	"github.com/darwinia-network/link/config"
 	"github.com/darwinia-network/link/db"
 	"github.com/darwinia-network/link/services/parallel"
 	"github.com/darwinia-network/link/util"
@@ -21,10 +22,9 @@ type EthTransaction struct {
 func (e *EthTransaction) Do(o Observable) error {
 	fmt.Println("find EthTransaction", e.Result)
 	if e.Result == nil || !util.StringInSlice(e.Result.Topics[0], EthAvailableEvent) {
-		fmt.Println(e.Result.Topics[0], EthAvailableEvent)
 		return fmt.Errorf("empty transaction %s", e.Result)
 	}
-	return e.RingBurnRecord()
+	return e.Redeem()
 }
 
 func (e *EthTransaction) Listen(o Observable) error {
@@ -52,22 +52,34 @@ func (e *EthTransaction) Listen(o Observable) error {
 	return nil
 }
 
-func (e *EthTransaction) RingBurnRecord() error {
+// https://github.com/darwinia-network/dj
+func (e *EthTransaction) Redeem() error {
 	logSlice := util.LogAnalysis(e.Result.Data)
 
-	if len(logSlice) != 4 || len(e.Result.Topics) != 3 {
-		return fmt.Errorf("error log or topic %s", e.Result.TransactionHash)
+	switch e.Result.Topics[0] {
+	case util.AddHex(hex.EncodeToString(crypto.SoliditySHA3(crypto.String("BurnAndRedeem(address,address,uint256,bytes)")))):
+		currency := "ring"
+		token := util.AddHex(e.Result.Topics[1][len(e.Result.Topics[1])-40:])
+		from := util.AddHex(e.Result.Topics[2][len(e.Result.Topics[2])-40:])
+		amount := decimal.NewFromBigInt(util.U256(logSlice[0]), 0)
+		target := logSlice[3]
+		if token == config.Link.Kton {
+			currency = "kton"
+		}
+		return db.AddRedeemRecord(Eth, util.AddHex(e.Result.TransactionHash), from, target, currency, amount,
+			int(util.U256(e.Result.BlockNumber).Int64()), int(util.U256(e.Result.TimeStamp).Int64()), "")
+
+	case util.AddHex(hex.EncodeToString(crypto.SoliditySHA3(crypto.String("BurnAndRedeem(uint256,address,uint48,uint48,uint64,uint128,bytes)")))):
+		depositId := util.U256(e.Result.Topics[1]).Int64()
+		from := util.AddHex(logSlice[0][len(logSlice[0])-40:])
+		month := util.U256(logSlice[1]).Int64()
+		startAt := util.U256(logSlice[2]).Int64()
+		amount := decimal.NewFromBigInt(util.U256(logSlice[4]), 0)
+		target := logSlice[7]
+		deposit := map[string]int64{"deposit_id": depositId, "month": month, "start": startAt}
+
+		return db.AddRedeemRecord(Eth, util.AddHex(e.Result.TransactionHash), from, target, "deposit", amount,
+			int(util.U256(e.Result.BlockNumber).Int64()), int(util.U256(e.Result.TimeStamp).Int64()), util.ToString(deposit))
 	}
-
-	address := util.AddHex(e.Result.Topics[2][len(e.Result.Topics[2])-40:])
-	amount := decimal.NewFromBigInt(util.U256(logSlice[0]), 0)
-	target := logSlice[3]
-
-	currency := ring
-	if e.Result.Topics[0] == util.AddHex(hex.EncodeToString(crypto.SoliditySHA3(crypto.String("KtonBuildInEvent(address,address,uint256,bytes)")))) {
-		currency = kton
-	}
-
-	return db.AddRingBurnRecord(Eth, util.AddHex(e.Result.TransactionHash), address, target, currency, amount,
-		int(util.U256(e.Result.BlockNumber).Int64()), int(util.U256(e.Result.TimeStamp).Int64()))
+	return nil
 }

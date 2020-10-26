@@ -68,7 +68,7 @@ func (e *eth) Event(v interface{}, start int64, address string, topic ...string)
 	q.Add("fromBlock", util.Int64ToString(start))
 	q.Add("toBlock", "latest")
 	q.Add("address", address)
-	// q.Add("topic0", topic[0])
+	q.Add("topic0", topic[0])
 	// if len(topic) == 2 {
 	// 	q.Add("topic0_1_opr", "or")
 	// 	q.Add("topic1", topic[1])

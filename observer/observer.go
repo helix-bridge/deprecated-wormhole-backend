@@ -47,14 +47,19 @@ func (o *ObservableConcrete) Run() (err error) {
 
 func Run() {
 	subject := &ObservableConcrete{}
-	subject.Attach(&EthTransaction{
-		Address: config.Link.EthRingBurn,
-		Method:  []string{"RingBuildInEvent(address,address,uint256,bytes)", "KtonBuildInEvent(address,address,uint256,bytes)"},
-	})
-	subject.Attach(&TronTransaction{
-		Address: config.Link.TronRingBurn,
-		Method:  []string{"RingBuildInEvent", "KtonBuildInEvent"},
-	})
+
+	subject.Attach(
+		&EthTransaction{
+			Address: config.Link.TokenRedeem,
+			Method: []string{
+				"BurnAndRedeem(address,address,uint256,bytes)",
+			}},
+		&EthTransaction{
+			Address: config.Link.DepositRedeem,
+			Method: []string{
+				"BurnAndRedeem(uint256,address,uint48,uint48,uint64,uint128,bytes)",
+			}},
+	)
 	_ = subject.Run()
 }
 
