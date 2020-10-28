@@ -9,6 +9,7 @@ import (
 	"github.com/darwinia-network/link/util"
 	"github.com/darwinia-network/link/util/crypto"
 	"github.com/shopspring/decimal"
+	"strings"
 	"time"
 )
 
@@ -28,7 +29,7 @@ func (e *EthTransaction) Do(o Observable) error {
 }
 
 func (e *EthTransaction) Listen(o Observable) error {
-	key := runFuncName()
+	key := strings.Join(e.Method,":")
 	if e.Last == 0 {
 		if b := util.GetCache(key); b != nil {
 			e.Last = util.StringToInt64(string(b))

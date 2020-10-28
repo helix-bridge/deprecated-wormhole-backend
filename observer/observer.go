@@ -59,6 +59,7 @@ func Run() {
 			Method: []string{
 				"BurnAndRedeem(uint256,address,uint48,uint48,uint64,uint128,bytes)",
 			}},
+		&SubscanEvent{EventId: "PendingRelayHeaderParcelApproved"},
 	)
 	_ = subject.Run()
 }

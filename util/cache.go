@@ -38,6 +38,16 @@ func GetCache(key string) []byte {
 		return []byte(cache)
 	}
 }
+func GetCacheUint64(key string) uint64 {
+	conn := SubPool.Get()
+	defer conn.Close()
+	if cache, err := redis.Uint64(conn.Do("get", cacheKey(key))); err != nil {
+		return 0
+	} else {
+		return cache
+	}
+}
+
 
 func DelCache(key string) {
 	conn := SubPool.Get()

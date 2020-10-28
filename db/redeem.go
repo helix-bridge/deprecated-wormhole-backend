@@ -18,6 +18,8 @@ type RedeemRecord struct {
 	Amount         decimal.Decimal `json:"amount" sql:"type:decimal(40,0);" `
 	BlockTimestamp int             `json:"block_timestamp"`
 	Deposit        string          `json:"deposit"`
+	DarwiniaTx     string          `json:"darwinia_tx"`
+	IsRelayed      bool            `json:"is_relayed" gorm:"-"`
 }
 
 func AddRedeemRecord(chain, tx, address, target, currency string, amount decimal.Decimal, blockNum, blockTimestamp int, deposit string) error {
@@ -32,5 +34,20 @@ func AddRedeemRecord(chain, tx, address, target, currency string, amount decimal
 func RedeemList(address string) (list []RedeemRecord) {
 	db := util.DB
 	db.Model(list).Where("address = ?", address).Order("block_num desc").Find(&list)
+	for index, value := range list {
+		list[index].IsRelayed = GetRelayBestBlockNum() >= uint64(value.BlockNum)
+	}
 	return
+}
+
+func UpdateRedeem(tx, darwiniaTx string) {
+	util.DB.Model(RedeemRecord{}).Where("tx = ?", tx).Update(RedeemRecord{DarwiniaTx: darwiniaTx})
+}
+
+func SetRelayBestBlockNum(blockNum uint64) {
+	_ = util.SetCache("RelayBestBlockNum", blockNum, 86400*30)
+}
+
+func GetRelayBestBlockNum() uint64 {
+	return util.GetCacheUint64("RelayBestBlockNum")
 }
