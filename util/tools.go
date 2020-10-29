@@ -54,3 +54,20 @@ func UInt64FromInterface(i interface{}) uint64 {
 	}
 	return 0
 }
+
+// Convert int64, uint64, float64, string to int, return 0 if other types
+func IntFromInterface(i interface{}) int {
+	switch i := i.(type) {
+	case int:
+		return i
+	case int64:
+		return int(i)
+	case uint64:
+		return int(i)
+	case float64:
+		return int(i)
+	case string:
+		return StringToInt(i)
+	}
+	return 0
+}

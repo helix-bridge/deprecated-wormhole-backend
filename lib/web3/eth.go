@@ -9,8 +9,7 @@ import (
 	"net/url"
 )
 
-type eth struct {
-}
+type eth struct{}
 
 type ReqBody struct {
 	JSONRPC string        `json:"jsonrpc"`
@@ -24,8 +23,21 @@ type TransactionParameters struct {
 	Data string `json:"data,omitempty"`
 }
 
+type Transaction struct {
+	JSONRPC string `json:"jsonrpc"`
+	ID      int    `json:"id"`
+	Result  struct {
+		BlockHash   string `json:"blockHash"`
+		BlockNumber string `json:"blockNumber"`
+		From        string `json:"from"`
+		Gas         string `json:"gas"`
+		GasPrice    string `json:"gasPrice"`
+		Hash        string `json:"hash"`
+	} `json:"result"`
+}
+
 func (e *eth) url() string {
-	return fmt.Sprintf("https://mainnet.infura.io/v3/%s", util.GetEnv("INFURA", "1bb85682d6494e219803bab49a4813dc"))
+	return util.GetEnv("INFURA", "https://ropsten.infura.io/v3/67fb2d92380a4ff8a2b1ebef24a81a8f")
 }
 
 func (e *eth) scan() string {
@@ -80,4 +92,24 @@ func (e *eth) Event(v interface{}, start int64, address string, topic ...string)
 		return err
 	}
 	return json.Unmarshal(response, v)
+}
+
+func (e *eth) GetTransactionByBlockHashAndIndex(blockHash string, index int) string {
+	r := ReqBody{
+		JSONRPC: "2.0",
+		Method:  "eth_getTransactionByBlockHashAndIndex",
+		ID:      1,
+		Params:  []interface{}{blockHash, fmt.Sprintf("0x%x", index)},
+	}
+	j, _ := json.Marshal(r)
+	b, err := util.PostWithJson(e.url(), bytes.NewReader(j))
+	if b == nil || err != nil {
+		return ""
+	}
+	var transaction Transaction
+	err = json.Unmarshal(b, &transaction)
+	if err != nil {
+		return ""
+	}
+	return transaction.Result.Hash
 }

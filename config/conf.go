@@ -17,6 +17,8 @@ type ApplicationConf struct {
 	DepositRedeem string
 	Kton          string
 	Ring          string
+	TronRing      string
+	TronKton      string
 }
 
 func LoadConf() {
@@ -42,5 +44,7 @@ func LoadConf() {
 	conf.DepositRedeem = contracts[strings.ToLower("DepositRedeem")]
 	conf.Kton = contracts[strings.ToLower("Kton")]
 	conf.Ring = contracts[strings.ToLower("Ring")]
+	conf.TronRing = contracts[strings.ToLower("TronRing")]
+	conf.TronKton = contracts[strings.ToLower("TronKton")]
 	Link = conf
 }

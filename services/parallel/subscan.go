@@ -1,23 +1,25 @@
 package parallel
 
 import (
-	"fmt"
+	"bytes"
+	"encoding/json"
 	"github.com/darwinia-network/link/util"
-	"strings"
 )
 
 type SubscanEventsRes struct {
 	Data struct {
 		Events []struct {
-			BlockNum int    `json:"block_num"`
-			Params   string `json:"params"`
+			BlockNum   int64  `json:"block_num"`
+			Params     string `json:"params"`
+			EventIndex string `json:"event_index"`
 		} `json:"events"`
 	} `json:"data"`
 }
 
 type SubscanEvent struct {
-	BlockNum int          `json:"block_num"`
-	Params   []EventParam `json:"params"`
+	BlockNum   int64        `json:"block_num"`
+	Params     []EventParam `json:"params"`
+	EventIndex string       `json:"event_index"`
 }
 
 type EventParam struct {
@@ -26,10 +28,24 @@ type EventParam struct {
 	ValueRaw string      `json:"valueRaw"`
 }
 
-func SubscanEvents(eventId string) (list []SubscanEvent) {
+type SubscanParams struct {
+	Row       int    `json:"row"`
+	Call      string `json:"call"`
+	Module    string `json:"module"`
+	FromBlock int64  `json:"from_block"`
+}
+
+func SubscanEvents(moduleId, eventId string, startBlock int64) (list []SubscanEvent) {
 	var res SubscanEventsRes
 	url := "https://crab.subscan.io/api/scan/events"
-	raw, err := util.PostWithJson(url, strings.NewReader(fmt.Sprintf(`{"row": 1, "page": 0, "call": "%s"}`, eventId)))
+	p := SubscanParams{
+		Row:       100,
+		Call:      eventId,
+		Module:    moduleId,
+		FromBlock: startBlock,
+	}
+	bp, _ := json.Marshal(p)
+	raw, err := util.PostWithJson(url, bytes.NewReader(bp))
 	if err != nil {
 		return nil
 	}
@@ -38,8 +54,9 @@ func SubscanEvents(eventId string) (list []SubscanEvent) {
 		var params []EventParam
 		util.UnmarshalAny(&params, event.Params)
 		list = append(list, SubscanEvent{
-			BlockNum: event.BlockNum,
-			Params:   params,
+			BlockNum:   event.BlockNum,
+			Params:     params,
+			EventIndex: event.EventIndex,
 		})
 	}
 	return

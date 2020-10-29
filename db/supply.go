@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"github.com/darwinia-network/link/config"
 	"github.com/darwinia-network/link/services/parallel"
 	"github.com/darwinia-network/link/util"
 	"github.com/shopspring/decimal"
@@ -33,8 +34,8 @@ type Currency struct {
 
 func RingSupply() *Supply {
 	ring := Currency{
-		EthContract:  "0x9469d013805bffb7d3debe5e7839237e535ec483",
-		TronContract: "TL175uyihLqQD656aFx3uhHYe1tyGkmXaW",
+		EthContract:  config.Link.Ring,
+		TronContract: config.Link.TronRing,
 		MaxSupply:    decimal.New(1, 10),
 	}
 	ring.FilterAddress = map[string][]string{
@@ -46,8 +47,8 @@ func RingSupply() *Supply {
 
 func KtonSupply() *Supply {
 	ring := Currency{
-		EthContract:  "0x9f284e1337a815fe77d2ff4ae46544645b20c5ff",
-		TronContract: "TW3kTpVtYYQ5Ka1awZvLb9Yy6ZTDEC93dC",
+		EthContract:  config.Link.Kton,
+		TronContract: config.Link.TronKton,
 	}
 	return ring.supply()
 }

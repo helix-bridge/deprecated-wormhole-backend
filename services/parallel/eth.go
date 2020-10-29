@@ -11,8 +11,6 @@ import (
 type Eth struct {
 }
 
-var ethContract = "0x9469d013805bffb7d3debe5e7839237e535ec483"
-
 type EthResponse struct {
 	Result string `json:"result,omitempty"`
 }
@@ -56,4 +54,9 @@ func EtherscanLog(start int64, address string, methods ...string) (*Etherscan, e
 		return nil, err
 	}
 	return &e, nil
+}
+
+func EthGetTransactionByBlockHashAndIndex(blockHash string, index int) string {
+	w := web3.New("eth")
+	return w.GetTransactionByBlockHashAndIndex(blockHash,index)
 }

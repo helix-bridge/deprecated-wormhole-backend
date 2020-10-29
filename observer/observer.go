@@ -51,15 +51,12 @@ func Run() {
 	subject.Attach(
 		&EthTransaction{
 			Address: config.Link.TokenRedeem,
-			Method: []string{
-				"BurnAndRedeem(address,address,uint256,bytes)",
-			}},
+			Method:  []string{"BurnAndRedeem(address,address,uint256,bytes)",}},
 		&EthTransaction{
 			Address: config.Link.DepositRedeem,
-			Method: []string{
-				"BurnAndRedeem(uint256,address,uint48,uint48,uint64,uint128,bytes)",
-			}},
-		&SubscanEvent{EventId: "PendingRelayHeaderParcelApproved"},
+			Method:  []string{"BurnAndRedeem(uint256,address,uint48,uint48,uint64,uint128,bytes)"}},
+		&SubscanEvent{ModuleId: "ethereumrelay", EventId: "PendingRelayHeaderParcelConfirmed"},
+		&SubscanEvent{ModuleId: "ethereumbacking"},
 	)
 	_ = subject.Run()
 }

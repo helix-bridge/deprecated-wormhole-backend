@@ -4,9 +4,14 @@ type Web3 interface {
 	Call(v interface{}, contract, method string, params ...string) error
 	url() string
 	Event(v interface{}, start int64, address string, topic ...string) error
+	GetTransactionByBlockHashAndIndex(blockHash string, index int) string
 }
 
 type web3 struct{}
+
+func (w3 *web3) GetTransactionByBlockHashAndIndex(blockHash string, index int) string {
+	panic("implement me")
+}
 
 func New(chain string) Web3 {
 	var w3 Web3

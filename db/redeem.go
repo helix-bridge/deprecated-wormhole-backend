@@ -45,7 +45,10 @@ func UpdateRedeem(tx, darwiniaTx string) {
 }
 
 func SetRelayBestBlockNum(blockNum uint64) {
-	_ = util.SetCache("RelayBestBlockNum", blockNum, 86400*30)
+	if blockNum > GetRelayBestBlockNum() {
+		_ = util.SetCache("RelayBestBlockNum", blockNum, 86400*30)
+	}
+
 }
 
 func GetRelayBestBlockNum() uint64 {

@@ -11,6 +11,10 @@ import (
 type tron struct {
 }
 
+func (e *tron) GetTransactionByBlockHashAndIndex(blockHash string, index int) string {
+	return ""
+}
+
 func (e *tron) url() string {
 	return "https://api.trongrid.io"
 }
