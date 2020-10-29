@@ -3,6 +3,8 @@ package parallel
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"github.com/darwinia-network/link/config"
 	"github.com/darwinia-network/link/util"
 )
 
@@ -37,7 +39,7 @@ type SubscanParams struct {
 
 func SubscanEvents(moduleId, eventId string, startBlock int64) (list []SubscanEvent) {
 	var res SubscanEventsRes
-	url := "https://crab.subscan.io/api/scan/events"
+	url := fmt.Sprintf("%s/api/scan/events", config.Link.SubscanHost)
 	p := SubscanParams{
 		Row:       100,
 		Call:      eventId,
@@ -45,6 +47,7 @@ func SubscanEvents(moduleId, eventId string, startBlock int64) (list []SubscanEv
 		FromBlock: startBlock,
 	}
 	bp, _ := json.Marshal(p)
+	fmt.Println(string(bp))
 	raw, err := util.PostWithJson(url, bytes.NewReader(bp))
 	if err != nil {
 		return nil

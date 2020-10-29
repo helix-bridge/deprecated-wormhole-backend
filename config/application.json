@@ -7,7 +7,8 @@
     "Ring": "0x9469d013805bffb7d3debe5e7839237e535ec483",
     "Kton": "0x9f284e1337a815fe77d2ff4ae46544645b20c5ff",
     "TronRing": "TL175uyihLqQD656aFx3uhHYe1tyGkmXaW",
-    "TronKton": "TW3kTpVtYYQ5Ka1awZvLb9Yy6ZTDEC93dC"
+    "TronKton": "TW3kTpVtYYQ5Ka1awZvLb9Yy6ZTDEC93dC",
+    "SubscanHost": "https://darwinia-cc1.subscan.io"
   },
   "dev": {
     "EthRingBurn": "0x7550aab5DFda37f646b1a826F27e9D604D8D1579",
@@ -17,6 +18,7 @@
     "Ring": "0xb52FBE2B925ab79a821b261C82c5Ba0814AAA5e0",
     "Kton": "0x1994100c58753793D52c6f457f189aa3ce9cEe94",
     "TronRing": "TL175uyihLqQD656aFx3uhHYe1tyGkmXaW",
-    "TronKton": "TW3kTpVtYYQ5Ka1awZvLb9Yy6ZTDEC93dC"
+    "TronKton": "TW3kTpVtYYQ5Ka1awZvLb9Yy6ZTDEC93dC",
+    "SubscanHost": "https://crab.subscan.io"
   }
 }
