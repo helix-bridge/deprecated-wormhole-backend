@@ -29,7 +29,7 @@ func (e *EthTransaction) Do(o Observable) error {
 }
 
 func (e *EthTransaction) Listen(o Observable) error {
-	key := strings.Join(e.Method,":")
+	key := strings.Join(e.Method, ":")
 	if e.Last == 0 {
 		if b := util.GetCache(key); b != nil {
 			e.Last = util.StringToInt64(string(b))
@@ -64,7 +64,7 @@ func (e *EthTransaction) Redeem() error {
 		from := util.AddHex(e.Result.Topics[2][len(e.Result.Topics[2])-40:])
 		amount := decimal.NewFromBigInt(util.U256(logSlice[0]), 0)
 		target := logSlice[3]
-		if token == config.Link.Kton {
+		if strings.EqualFold(token,config.Link.Kton) {
 			currency = "kton"
 		}
 		return db.AddRedeemRecord(Eth, util.AddHex(e.Result.TransactionHash), from, target, currency, amount,
