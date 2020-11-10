@@ -34,7 +34,13 @@ func EthereumRelay() gin.HandlerFunc {
 			c.JSON(http.StatusOK, JsonFormat(nil, 1001))
 			return
 		}
-		db.UpdateRedeem(p.Tx,p.DarwiniaTx)
-		c.JSON(http.StatusOK,JsonFormat(nil, 0))
+		db.UpdateRedeem(p.Tx, p.DarwiniaTx)
+		c.JSON(http.StatusOK, JsonFormat(nil, 0))
+	}
+}
+
+func redeemStat() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, JsonFormat(db.RedeemStat(), 0))
 	}
 }

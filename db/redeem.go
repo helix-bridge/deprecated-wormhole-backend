@@ -54,3 +54,23 @@ func SetRelayBestBlockNum(blockNum uint64) {
 func GetRelayBestBlockNum() uint64 {
 	return util.GetCacheUint64("RelayBestBlockNum")
 }
+
+func RedeemStat() map[string]interface{} {
+	db := util.DB
+	type NSum struct {
+		N decimal.Decimal
+	}
+	var n NSum
+	pre := decimal.New(1, 18)
+	r := make(map[string]interface{})
+	db.Model(RedeemRecord{}).Select("sum(amount) as n").Where("currency = 'ring'").Scan(&n)
+	r["ring"] = n.N.Div(pre)
+	db.Model(RedeemRecord{}).Select("sum(amount) as n").Where("currency = 'kton'").Scan(&n)
+	r["kton"] = n.N.Div(pre)
+	db.Model(RedeemRecord{}).Select("sum(amount) as n").Where("currency = 'deposit'").Scan(&n)
+	r["deposit"] = n.N.Div(pre)
+	var count int
+	db.Model(RedeemRecord{}).Count(&count)
+	r["count"] = count
+	return r
+}

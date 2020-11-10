@@ -18,11 +18,13 @@ func Run(server *gin.Engine) {
 	})
 	api.GET("ringBurn", ringBurn())
 	api.GET("redeem", redeem())
+	api.GET("redeem/stat", redeemStat())
 	api.GET("supply", cache.CachePage(store, time.Minute, ringSupply()))
 	api.POST("/subscribe", subscribe())
 
-	internal := server.Group("/internal")
-	internal.POST("redeem/relay", EthereumRelay())
+
+	// internal := server.Group("/internal")
+	// internal.POST("redeem/relay", EthereumRelay())
 }
 
 func JsonFormat(data interface{}, code int) map[string]interface{} {
