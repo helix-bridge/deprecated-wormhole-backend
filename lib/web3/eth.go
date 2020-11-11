@@ -36,8 +36,10 @@ type Transaction struct {
 	} `json:"result"`
 }
 
+const etherscanKey = "G78R6SGMHGXSMXZCBDW8WE716YQFQGJ68F"
+
 func (e *eth) url() string {
-	return util.GetEnv("INFURA", "https://ropsten.infura.io/v3/67fb2d92380a4ff8a2b1ebef24a81a8f")
+	return util.GetEnv("INFURA", "https://api.etherscan.io/api?")
 }
 
 func (e *eth) scan() string {
@@ -46,24 +48,17 @@ func (e *eth) scan() string {
 
 func (e *eth) Call(v interface{}, contract, method string, params ...string) error {
 	sha3Function := util.AddHex(util.BytesToHex(crypto.SoliditySHA3(crypto.String(method))))
-	body := make([]interface{}, 2)
 	var data string
 	for _, param := range params {
 		data = data + util.Padding(param)
 	}
-	body[0] = TransactionParameters{
-		To:   contract,
-		Data: sha3Function[0:10] + data,
-	}
-	body[1] = "latest"
-	r := ReqBody{
-		JSONRPC: "2.0",
-		Method:  "eth_call",
-		ID:      1,
-		Params:  body,
-	}
-	j, _ := json.Marshal(r)
-	response, err := util.PostWithJson(e.url(), bytes.NewReader(j))
+	q := url.Values{}
+	q.Add("module", "proxy")
+	q.Add("action", "eth_call")
+	q.Add("to", contract)
+	q.Add("data", sha3Function[0:10]+data)
+	q.Add("apikey", util.GetEnv("ETHSCAN_KEY", etherscanKey))
+	response, err := util.HttpGet(fmt.Sprintf("%s%s", e.url(), q.Encode()))
 	if err != nil {
 		return err
 	}
@@ -81,11 +76,7 @@ func (e *eth) Event(v interface{}, start int64, address string, topic ...string)
 	q.Add("toBlock", "latest")
 	q.Add("address", address)
 	q.Add("topic0", topic[0])
-	// if len(topic) == 2 {
-	// 	q.Add("topic0_1_opr", "or")
-	// 	q.Add("topic1", topic[1])
-	// }
-	q.Add("apikey", util.GetEnv("ETHSCAN_KEY", "G78R6SGMHGXSMXZCBDW8WE716YQFQGJ68F"))
+	q.Add("apikey", util.GetEnv("ETHSCAN_KEY", etherscanKey))
 	fmt.Println(fmt.Sprintf("%s%s", etherscan, q.Encode()))
 	response, err := util.HttpGet(fmt.Sprintf("%s%s", etherscan, q.Encode()))
 	if err != nil {
