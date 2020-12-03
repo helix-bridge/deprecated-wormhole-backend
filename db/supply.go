@@ -6,6 +6,7 @@ import (
 	"github.com/darwinia-network/link/services/parallel"
 	"github.com/darwinia-network/link/util"
 	"github.com/shopspring/decimal"
+	"strings"
 	"sync"
 )
 
@@ -26,6 +27,7 @@ type SupplyDetail struct {
 }
 
 type Currency struct {
+	Code          string
 	EthContract   string
 	TronContract  string
 	MaxSupply     decimal.Decimal
@@ -34,6 +36,7 @@ type Currency struct {
 
 func RingSupply() *Supply {
 	ring := Currency{
+		Code:         "ring",
 		EthContract:  config.Link.Ring,
 		TronContract: config.Link.TronRing,
 		MaxSupply:    decimal.New(1, 10),
@@ -46,11 +49,12 @@ func RingSupply() *Supply {
 }
 
 func KtonSupply() *Supply {
-	ring := Currency{
+	kton := Currency{
+		Code:         "kton",
 		EthContract:  config.Link.Kton,
 		TronContract: config.Link.TronKton,
 	}
-	return ring.supply()
+	return kton.supply()
 }
 
 // todo，need cache here
@@ -58,25 +62,24 @@ func (c *Currency) supply() *Supply {
 	var supply Supply
 	supply.MaxSupply = c.MaxSupply // 10 billion
 	wg := sync.WaitGroup{}
-
+	wg.Add(3)
 	go func() {
 		ethSupply := c.ethSupply()
-		supply.TotalSupply = supply.TotalSupply.Add(ethSupply.TotalSupply)
 		supply.CirculatingSupply = supply.CirculatingSupply.Add(ethSupply.CirculatingSupply)
 		supply.Details = append(supply.Details, ethSupply)
 		wg.Done()
 	}()
-	wg.Add(1)
 	go func() {
 		tronSupply := c.tronSupply()
-		supply.TotalSupply = supply.TotalSupply.Add(tronSupply.TotalSupply)
 		supply.CirculatingSupply = supply.CirculatingSupply.Add(tronSupply.CirculatingSupply)
 		supply.Details = append(supply.Details, tronSupply)
 		wg.Done()
 	}()
-	wg.Add(1)
+	go func() {
+		supply.TotalSupply = c.TotalSupply()
+		wg.Done()
+	}()
 	wg.Wait()
-
 	if supply.MaxSupply.IsZero() {
 		for _, one := range supply.Details {
 			supply.MaxSupply = supply.MaxSupply.Add(one.TotalSupply)
@@ -114,6 +117,23 @@ func (c *Currency) tronSupply() *SupplyDetail {
 	supply.Type = "trc20"
 
 	return &supply
+}
+
+func (c *Currency) TotalSupply() decimal.Decimal {
+	type TokenDetail struct {
+		TotalIssuance decimal.Decimal `json:"total_issuance"`
+		TokenDecimals int             `json:"token_decimals"`
+	}
+	type SubscanTokenRes struct {
+		Data struct {
+			Detail map[string]TokenDetail `json:"detail"`
+		} `json:"data"`
+	}
+	var res SubscanTokenRes
+	b, _ := util.HttpGet("https://darwinia-cc1.subscan.io/api/scan/token")
+	util.UnmarshalAny(&res, b)
+	detail := res.Data.Detail[strings.ToUpper(c.Code)]
+	return detail.TotalIssuance.Div(decimal.New(1, int32(detail.TokenDecimals)))
 }
 
 func (s *SupplyDetail) filterBalance(filterAddress map[string][]string) decimal.Decimal {

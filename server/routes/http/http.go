@@ -11,8 +11,8 @@ func Run(server *gin.Engine) {
 
 	store := persistence.NewInMemoryStore(time.Second)
 	api := server.Group("/api")
-	server.GET("supply/ring", cache.CachePage(store, time.Minute, ringSupply()))
-	server.GET("supply/kton", cache.CachePage(store, time.Minute, ktonSupply()))
+	server.GET("supply/ring", cache.CachePage(store, time.Minute*5, ringSupply()))
+	server.GET("supply/kton", cache.CachePage(store, time.Minute*5, ktonSupply()))
 	api.GET("/status", func(c *gin.Context) {
 		c.String(200, "OK")
 	})
@@ -21,10 +21,6 @@ func Run(server *gin.Engine) {
 	api.GET("redeem/stat", redeemStat())
 	api.GET("supply", cache.CachePage(store, time.Minute, ringSupply()))
 	api.POST("/subscribe", subscribe())
-
-
-	// internal := server.Group("/internal")
-	// internal.POST("redeem/relay", EthereumRelay())
 }
 
 func JsonFormat(data interface{}, code int) map[string]interface{} {
