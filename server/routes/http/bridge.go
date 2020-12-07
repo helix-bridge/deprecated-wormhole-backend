@@ -24,20 +24,6 @@ func redeem() gin.HandlerFunc {
 	}
 }
 
-func EthereumRelay() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		p := new(struct {
-			Tx         string `json:"tx" binding:"required"`
-			DarwiniaTx string `json:"darwinia_tx" binding:"required"`
-		})
-		if err := c.ShouldBindJSON(p); err != nil {
-			c.JSON(http.StatusOK, JsonFormat(nil, 1001))
-			return
-		}
-		db.UpdateRedeem(p.Tx, p.DarwiniaTx)
-		c.JSON(http.StatusOK, JsonFormat(nil, 0))
-	}
-}
 
 func redeemStat() gin.HandlerFunc {
 	return func(c *gin.Context) {
