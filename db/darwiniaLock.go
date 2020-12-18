@@ -16,6 +16,7 @@ type DarwiniaBackingLock struct {
 	RingValue      decimal.Decimal `json:"ring_value" sql:"type:decimal(30,0);"`
 	KtonValue      decimal.Decimal `json:"kton_value" sql:"type:decimal(30,0);"`
 	Target         string          `json:"target" sql:"default: null;size:100"`
+	BlockTimestamp int             `json:"block_timestamp"`
 }
 
 func CreateDarwiniaBacking(extrinsicIndex string, detail *parallel.ExtrinsicDetail) error {
@@ -25,6 +26,7 @@ func CreateDarwiniaBacking(extrinsicIndex string, detail *parallel.ExtrinsicDeta
 		ExtrinsicIndex: extrinsicIndex,
 		BlockHash:      detail.BlockHash,
 		BlockNum:       detail.BlockNum,
+		BlockTimestamp: detail.BlockTimestamp,
 	}
 	for _, event := range detail.Event {
 		switch event.EventId {

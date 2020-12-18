@@ -23,8 +23,9 @@ type SubscanEventsRes struct {
 
 type SubscanExtrinsicRes struct {
 	Data struct {
-		BlockNum int `json:"block_num"`
-		Events   []struct {
+		BlockTimestamp int `json:"block_timestamp"`
+		BlockNum       int `json:"block_num"`
+		Events         []struct {
 			BlockNum   int64  `json:"block_num"`
 			Params     string `json:"params"`
 			EventIndex string `json:"event_index"`
@@ -79,9 +80,10 @@ func SubscanEvents(moduleId, eventId string, startBlock int64) (list []SubscanEv
 }
 
 type ExtrinsicDetail struct {
-	BlockNum  int            `json:"block_num"`
-	Event     []SubscanEvent `json:"event"`
-	BlockHash string         `json:"block_hash"`
+	BlockNum       int            `json:"block_num"`
+	Event          []SubscanEvent `json:"event"`
+	BlockHash      string         `json:"block_hash"`
+	BlockTimestamp int            `json:"block_timestamp"`
 }
 
 func SubscanExtrinsic(extrinsicIndex string) *ExtrinsicDetail {
@@ -97,6 +99,7 @@ func SubscanExtrinsic(extrinsicIndex string) *ExtrinsicDetail {
 	var detail ExtrinsicDetail
 	detail.BlockNum = res.Data.BlockNum
 	detail.BlockHash = res.Data.BlockHash
+	detail.BlockTimestamp = res.Data.BlockTimestamp
 	var list []SubscanEvent
 	for _, event := range res.Data.Events {
 		var params []EventParam

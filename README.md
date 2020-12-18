@@ -170,7 +170,7 @@ mainnet host: http://api.darwinia.network/
 
 -----
 
-#### redeem
+#### redeem-stat
 
 `Get /api/redeem/stat`
 
@@ -186,6 +186,40 @@ mainnet host: http://api.darwinia.network/
     "deposit": "64557888.27476433",
     "kton": "3662.4554949786769339",
     "ring": "46189225.3529069620597258"
+  },
+  "msg": "ok"
+}
+```
+
+#### ethereumBacking-locks
+
+`Get /api/ethereumBacking/locks`
+
+| name   | type   | require |
+| ------ | ------ | ------- |
+| address |  string | yes     |
+
+
+### Example Response
+
+`200 OK` and
+```json
+{
+  "code": 0,
+  "data": {
+    "count": 1,
+    "list": [
+      {
+        "extrinsic_Index": "145081-1",
+        "account_id": "129f002b1c0787ea72c31b2dc986e66911fe1b4d6dc16f83a1127f33e5a74c7d",
+        "block_num": 145081,
+        "block_hash": "0xd033b3c568059c7b12e565ba77cd83e4f426e7571d7b4caa72b8dfdf8f907d03",
+        "ring_value": "1000000000",
+        "kton_value": "0",
+        "target": "0xb34CA61CE3202315aAE32E70f0101d938c0bd13d",
+        "block_timestamp": 1604653686
+      }
+  ]
   },
   "msg": "ok"
 }
