@@ -8,7 +8,7 @@ import (
 )
 
 type DarwiniaBackingLock struct {
-	ExtrinsicIndex string          `json:"extrinsic_Index" gorm:"primary_key;auto_increment:false"`
+	ExtrinsicIndex string          `json:"extrinsic_index" gorm:"primary_key;auto_increment:false"`
 	CreatedAt      time.Time       `json:"-"`
 	AccountId      string          `json:"account_id"`
 	BlockNum       int             `json:"block_num"`
