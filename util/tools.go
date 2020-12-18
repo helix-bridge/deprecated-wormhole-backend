@@ -2,6 +2,8 @@ package util
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/shopspring/decimal"
 	"strconv"
 )
 
@@ -70,4 +72,37 @@ func IntFromInterface(i interface{}) int {
 		return StringToInt(i)
 	}
 	return 0
+}
+
+func Debug(i interface{}) {
+	var val string
+	switch i := i.(type) {
+	case string:
+		val = i
+	case []byte:
+		val = string(i)
+	case error:
+		val = i.Error()
+	default:
+		b, _ := json.MarshalIndent(i, "", "  ")
+		val = string(b)
+	}
+	fmt.Println(val)
+}
+
+func DecimalFromInterface(i interface{}) decimal.Decimal {
+	switch i := i.(type) {
+	case int:
+		return decimal.New(int64(i), 0)
+	case int64:
+		return decimal.New(i, 0)
+	case uint64:
+		return decimal.New(int64(i), 0)
+	case float64:
+		return decimal.NewFromFloat(i)
+	case string:
+		r, _ := decimal.NewFromString(i)
+		return r
+	}
+	return decimal.Zero
 }

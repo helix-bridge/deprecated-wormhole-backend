@@ -16,7 +16,7 @@ type SubscanEvent struct {
 }
 
 func (s *SubscanEvent) Do(o Observable) error {
-	return s.RelayBlock()
+	return s.Process()
 }
 
 func (s *SubscanEvent) Listen(o Observable) error {
@@ -49,19 +49,25 @@ type EthereumTransactionIndex struct {
 	Index     int    `json:"col2"`
 }
 
-func (s *SubscanEvent) RelayBlock() error {
+func (s *SubscanEvent) Process() error {
 	switch s.ModuleId {
 	case "ethereumrelay":
 		db.SetRelayBestBlockNum(util.UInt64FromInterface(s.Result.Params[0].Value))
 	case "ethereumbacking":
-		for _, param := range s.Result.Params {
-			if strings.EqualFold(param.Type, "EthereumTransactionIndex") {
-				var t EthereumTransactionIndex
-				util.UnmarshalAny(&t, param.Value)
-				if fromTx := parallel.EthGetTransactionByBlockHashAndIndex(t.BlockHash, util.IntFromInterface(t.Index)); fromTx != "" {
-					db.UpdateRedeem(fromTx, s.Result.EventIndex)
+		switch s.Result.EventId {
+		case "RedeemDeposit", "RedeemKton", "RedeemRing":
+			for _, param := range s.Result.Params {
+				if strings.EqualFold(param.Type, "EthereumTransactionIndex") {
+					var t EthereumTransactionIndex
+					util.UnmarshalAny(&t, param.Value)
+					if fromTx := parallel.EthGetTransactionByBlockHashAndIndex(t.BlockHash, util.IntFromInterface(t.Index)); fromTx != "" {
+						db.UpdateRedeem(fromTx, s.Result.ExtrinsicIndex)
+					}
 				}
 			}
+		case "LockKton", "LockRing":
+			extrinsic := parallel.SubscanExtrinsic(s.Result.ExtrinsicIndex)
+			_ = db.CreateDarwiniaBacking(s.Result.ExtrinsicIndex, extrinsic)
 		}
 	}
 	return nil

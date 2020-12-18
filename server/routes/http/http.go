@@ -20,6 +20,7 @@ func Run(server *gin.Engine) {
 	api.GET("redeem", redeem())
 	api.GET("redeem/stat", redeemStat())
 	api.GET("supply", cache.CachePage(store, time.Minute, ringSupply()))
+	api.GET("ethereumBacking/locks",locks())
 	api.POST("/subscribe", subscribe())
 }
 
