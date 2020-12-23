@@ -36,6 +36,22 @@ type SubscanExtrinsicRes struct {
 	} `json:"data"`
 }
 
+type SubscanBlockHeaderRes struct {
+	Data *BlockHeader `json:"data"`
+}
+
+type BlockHeader struct {
+	ParentHash     string   `json:"parent_hash"`
+	BlockNumber    int      `json:"block_number"`
+	StateRoot      string   `json:"state_root"`
+	ExtrinsicsRoot string   `json:"extrinsics_root"`
+	Digest         []string `json:"digest"`
+}
+
+type SubscanLogsRes struct {
+	Data []SubscanLog `json:"data"`
+}
+
 type SubscanEvent struct {
 	BlockNum       int64        `json:"block_num"`
 	Params         []EventParam `json:"event"`
@@ -54,6 +70,11 @@ type SubscanParams struct {
 	Call      string `json:"call"`
 	Module    string `json:"module"`
 	FromBlock int64  `json:"from_block"`
+}
+
+type SubscanLog struct {
+	LogType string `json:"log_type"`
+	Data    string `json:"data"`
 }
 
 func SubscanEvents(moduleId, eventId string, startBlock int64) (list []SubscanEvent) {
@@ -95,7 +116,6 @@ func SubscanExtrinsic(extrinsicIndex string) *ExtrinsicDetail {
 		return nil
 	}
 	util.UnmarshalAny(&res, raw)
-	util.Debug(res)
 	var detail ExtrinsicDetail
 	detail.BlockNum = res.Data.BlockNum
 	detail.BlockHash = res.Data.BlockHash
@@ -108,4 +128,26 @@ func SubscanExtrinsic(extrinsicIndex string) *ExtrinsicDetail {
 	}
 	detail.Event = list
 	return &detail
+}
+
+func SubscanLogs(blockNum uint) []SubscanLog {
+	var res SubscanLogsRes
+	url := fmt.Sprintf("%s/api/scan/logs", config.Link.SubscanHost)
+	raw, err := util.PostWithJson(url, strings.NewReader(fmt.Sprintf(`{"block_num":%d}`, blockNum)))
+	if err != nil {
+		return nil
+	}
+	util.UnmarshalAny(&res, raw)
+	return res.Data
+}
+
+func SubscanBlockHeader(blockNum uint) *BlockHeader {
+	var res SubscanBlockHeaderRes
+	url := fmt.Sprintf("%s/api/scan/header", config.Link.SubscanHost)
+	raw, err := util.PostWithJson(url, strings.NewReader(fmt.Sprintf(`{"block_num":%d}`, blockNum)))
+	if err != nil {
+		return nil
+	}
+	util.UnmarshalAny(&res, raw)
+	return res.Data
 }

@@ -20,6 +20,7 @@ type ApplicationConf struct {
 	TronRing      string
 	TronKton      string
 	SubscanHost   string
+	ImplName      string
 }
 
 func LoadConf() {
@@ -48,5 +49,6 @@ func LoadConf() {
 	conf.TronRing = contracts[strings.ToLower("TronRing")]
 	conf.TronKton = contracts[strings.ToLower("TronKton")]
 	conf.SubscanHost = contracts[strings.ToLower("SubscanHost")]
+	conf.ImplName = contracts[strings.ToLower("ImplName")]
 	Link = conf
 }

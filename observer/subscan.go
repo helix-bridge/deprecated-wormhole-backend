@@ -51,9 +51,9 @@ type EthereumTransactionIndex struct {
 
 func (s *SubscanEvent) Process() error {
 	switch s.ModuleId {
-	case "ethereumrelay":
+	case strings.ToLower("EthereumRelay"):
 		db.SetRelayBestBlockNum(util.UInt64FromInterface(s.Result.Params[0].Value))
-	case "ethereumbacking":
+	case strings.ToLower("EthereumBacking"):
 		switch s.Result.EventId {
 		case "RedeemDeposit", "RedeemKton", "RedeemRing":
 			for _, param := range s.Result.Params {
@@ -69,6 +69,8 @@ func (s *SubscanEvent) Process() error {
 			extrinsic := parallel.SubscanExtrinsic(s.Result.ExtrinsicIndex)
 			_ = db.CreateDarwiniaBacking(s.Result.ExtrinsicIndex, extrinsic)
 		}
+	case strings.ToLower("EthereumRelayAuthorities"):
+		_ = db.MMRRootSigned(s.Result.Params)
 	}
 	return nil
 }

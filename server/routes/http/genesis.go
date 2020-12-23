@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/darwinia-network/link/config"
 	"github.com/darwinia-network/link/db"
 	"github.com/darwinia-network/link/util"
 	"github.com/gin-gonic/gin"
@@ -41,7 +42,7 @@ func locks() gin.HandlerFunc {
 		}
 		list, count := db.DarwiniaBackingLocks(p.Address, p.Page, p.Row)
 		c.JSON(http.StatusOK, JsonFormat(map[string]interface{}{
-			"list": list, "count": count,
+			"list": list, "count": count, "implName": config.Link.ImplName,
 		}, 0))
 	}
 }
