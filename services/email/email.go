@@ -2,22 +2,23 @@ package email
 
 import (
 	"fmt"
-	"github.com/darwinia-network/link/util"
-	"github.com/jordan-wright/email"
 	"net/smtp"
 	"os"
+
+	"github.com/darwinia-network/link/util"
+	"github.com/jordan-wright/email"
 )
 
 func SendToSubscribe(to string) {
-	from := "noreply@darwinia.network"
+	username := util.GetEnv("SMTP_USERNAME", "")
 	password := util.GetEnv("SMTP_PASSWORD", "")
 	e := email.NewEmail()
-	e.From = "Darwinia Network <" + from + ">"
+	e.From = "Darwinia Network <noreply@darwinia.network>"
 	e.To = []string{to}
-	e.Subject = "Success Subscribe"
+	e.Subject = "You've Subscribed to Darwinia Network!"
 	e.HTML = []byte(SubscribeEmail)
 	if os.Getenv("GIN_MODE") == "release" {
-		if err := e.Send("smtp.gmail.com:587", smtp.PlainAuth("", from, password, "smtp.gmail.com")); err != nil {
+		if err := e.Send("smtp.gmail.com:587", smtp.PlainAuth("", username, password, "smtp.gmail.com")); err != nil {
 			fmt.Println("Send mail error ...........", err)
 		}
 	}
