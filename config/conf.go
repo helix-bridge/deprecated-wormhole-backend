@@ -11,16 +11,17 @@ import (
 var Link ApplicationConf
 
 type ApplicationConf struct {
-	EthRingBurn   string
-	TronRingBurn  string
-	TokenRedeem   string
-	DepositRedeem string
-	Kton          string
-	Ring          string
-	TronRing      string
-	TronKton      string
-	SubscanHost   string
-	ImplName      string
+	EthRingBurn     string
+	TronRingBurn    string
+	TokenRedeem     string
+	DepositRedeem   string
+	EthBridgerRelay string
+	Kton            string
+	Ring            string
+	TronRing        string
+	TronKton        string
+	SubscanHost     string
+	ImplName        string
 }
 
 func LoadConf() {
@@ -44,6 +45,7 @@ func LoadConf() {
 	conf.TronRingBurn = contracts[strings.ToLower("TronRingBurn")]
 	conf.TokenRedeem = contracts[strings.ToLower("TokenRedeem")]
 	conf.DepositRedeem = contracts[strings.ToLower("DepositRedeem")]
+	conf.EthBridgerRelay = contracts[strings.ToLower("EthBridgerRelay")]
 	conf.Kton = contracts[strings.ToLower("Kton")]
 	conf.Ring = contracts[strings.ToLower("Ring")]
 	conf.TronRing = contracts[strings.ToLower("TronRing")]

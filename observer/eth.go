@@ -1,13 +1,11 @@
 package observer
 
 import (
-	"encoding/hex"
 	"fmt"
 	"github.com/darwinia-network/link/config"
 	"github.com/darwinia-network/link/db"
 	"github.com/darwinia-network/link/services/parallel"
 	"github.com/darwinia-network/link/util"
-	"github.com/darwinia-network/link/util/crypto"
 	"github.com/shopspring/decimal"
 	"strings"
 	"time"
@@ -58,19 +56,19 @@ func (e *EthTransaction) Redeem() error {
 	logSlice := util.LogAnalysis(e.Result.Data)
 
 	switch e.Result.Topics[0] {
-	case util.AddHex(hex.EncodeToString(crypto.SoliditySHA3(crypto.String("BurnAndRedeem(address,address,uint256,bytes)")))):
+	case BurnAndRedeem:
 		currency := "ring"
 		token := util.AddHex(e.Result.Topics[1][len(e.Result.Topics[1])-40:])
 		from := util.AddHex(e.Result.Topics[2][len(e.Result.Topics[2])-40:])
 		amount := decimal.NewFromBigInt(util.U256(logSlice[0]), 0)
 		target := logSlice[3]
-		if strings.EqualFold(token,config.Link.Kton) {
+		if strings.EqualFold(token, config.Link.Kton) {
 			currency = "kton"
 		}
 		return db.AddRedeemRecord(Eth, util.AddHex(e.Result.TransactionHash), from, target, currency, amount,
 			int(util.U256(e.Result.BlockNumber).Int64()), int(util.U256(e.Result.TimeStamp).Int64()), "")
 
-	case util.AddHex(hex.EncodeToString(crypto.SoliditySHA3(crypto.String("BurnAndRedeem(uint256,address,uint48,uint48,uint64,uint128,bytes)")))):
+	case BurnAndRedeemDeposit:
 		depositId := util.U256(e.Result.Topics[1]).Int64()
 		from := util.AddHex(logSlice[0][len(logSlice[0])-40:])
 		month := util.U256(logSlice[1]).Int64()
@@ -81,6 +79,9 @@ func (e *EthTransaction) Redeem() error {
 
 		return db.AddRedeemRecord(Eth, util.AddHex(e.Result.TransactionHash), from, target, "deposit", amount,
 			int(util.U256(e.Result.BlockNumber).Int64()), int(util.U256(e.Result.TimeStamp).Int64()), util.ToString(deposit))
+	case VerifyProof:
+		blockNum := util.U256(logSlice[0]).Uint64()
+		return db.SetBackingLockConfirm(blockNum, util.AddHex(e.Result.TransactionHash))
 	}
 	return nil
 }

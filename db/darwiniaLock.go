@@ -1,7 +1,6 @@
 package db
 
 import (
-	"encoding/binary"
 	"github.com/darwinia-network/link/services/parallel"
 	"github.com/darwinia-network/link/util"
 	"github.com/shopspring/decimal"
@@ -23,6 +22,7 @@ type DarwiniaBackingLock struct {
 	MMRRoot        string          `json:"mmr_root"`
 	Signatures     string          `json:"signatures" sql:"type:text;"`
 	BlockHeader    string          `json:"block_header" sql:"type:text;"`
+	Tx             string          `json:"tx"`
 }
 
 func CreateDarwiniaBacking(extrinsicIndex string, detail *parallel.ExtrinsicDetail) error {
@@ -111,20 +111,7 @@ func MMRRootSigned(eventParams []parallel.EventParam) error {
 	return query.Error
 }
 
-func BuilderHeader(header *parallel.BlockHeader) string {
-	b := strings.Builder{}
-	b.WriteString("0x")
-	b.WriteString(util.TrimHex(header.ParentHash))
-	bs := make([]byte, 8)
-	binary.LittleEndian.PutUint64(bs, uint64(header.BlockNumber))
-	b.WriteString(util.BytesToHex(bs))
-	b.WriteString(util.TrimHex(header.StateRoot))
-	b.WriteString(util.TrimHex(header.ExtrinsicsRoot))
-	bs = make([]byte, 4)
-	binary.LittleEndian.PutUint32(bs, uint32(len(header.Digest)<<2))
-	b.WriteString(util.BytesToHex(bs[0:1]))
-	for _, log := range header.Digest {
-		b.WriteString(util.TrimHex(log))
-	}
-	return b.String()
+func SetBackingLockConfirm(blockNum uint64, tx string) error {
+	query := util.DB.Model(DarwiniaBackingLock{}).Where("block_num = ?", blockNum).Update(DarwiniaBackingLock{Tx: tx})
+	return query.Error
 }
