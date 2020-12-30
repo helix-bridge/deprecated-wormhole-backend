@@ -8,11 +8,21 @@ import (
 
 func ringSupply() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, JsonFormat(db.RingSupply(), 0))
+		supply := db.RingSupply()
+		if c.Query("t") == "totalSupply" {
+			c.String(http.StatusOK, supply.TotalSupply.String())
+			return
+		}
+		c.JSON(http.StatusOK, JsonFormat(supply, 0))
 	}
 }
 func ktonSupply() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, JsonFormat(db.KtonSupply(), 0))
+		supply := db.KtonSupply()
+		if c.Query("t") == "totalSupply" {
+			c.String(http.StatusOK, supply.TotalSupply.String())
+			return
+		}
+		c.JSON(http.StatusOK, JsonFormat(supply, 0))
 	}
 }
