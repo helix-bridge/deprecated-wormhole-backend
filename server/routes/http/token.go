@@ -13,6 +13,10 @@ func ringSupply() gin.HandlerFunc {
 			c.String(http.StatusOK, supply.TotalSupply.String())
 			return
 		}
+		if c.Query("t") == "CirculatingSupply" {
+			c.String(http.StatusOK, supply.CirculatingSupply.String())
+			return
+		}
 		c.JSON(http.StatusOK, JsonFormat(supply, 0))
 	}
 }
@@ -21,6 +25,10 @@ func ktonSupply() gin.HandlerFunc {
 		supply := db.KtonSupply()
 		if c.Query("t") == "totalSupply" {
 			c.String(http.StatusOK, supply.TotalSupply.String())
+			return
+		}
+		if c.Query("t") == "CirculatingSupply" {
+			c.String(http.StatusOK, supply.CirculatingSupply.String())
 			return
 		}
 		c.JSON(http.StatusOK, JsonFormat(supply, 0))
