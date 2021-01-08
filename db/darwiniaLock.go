@@ -115,3 +115,12 @@ func SetBackingLockConfirm(blockNum uint64, tx string) error {
 	query := util.DB.Model(DarwiniaBackingLock{}).Where("block_num = ?", blockNum).Update(DarwiniaBackingLock{Tx: tx})
 	return query.Error
 }
+
+func BackingLock(extrinsicIndex string) *DarwiniaBackingLock {
+	var d DarwiniaBackingLock
+	query := util.DB.Model(DarwiniaBackingLock{}).Where("extrinsic_index = ?", extrinsicIndex).Find(&d)
+	if query.Error != nil || query.RecordNotFound() {
+		return nil
+	}
+	return &d
+}
