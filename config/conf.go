@@ -16,6 +16,7 @@ type ApplicationConf struct {
 	TokenRedeem     string
 	DepositRedeem   string
 	EthBridgerRelay string
+	TokenIssuing    string
 	Kton            string
 	Ring            string
 	TronRing        string
@@ -46,6 +47,7 @@ func LoadConf() {
 	conf.TokenRedeem = contracts[strings.ToLower("TokenRedeem")]
 	conf.DepositRedeem = contracts[strings.ToLower("DepositRedeem")]
 	conf.EthBridgerRelay = contracts[strings.ToLower("EthBridgerRelay")]
+	conf.TokenIssuing = contracts[strings.ToLower("TokenIssuing")]
 	conf.Kton = contracts[strings.ToLower("Kton")]
 	conf.Ring = contracts[strings.ToLower("Ring")]
 	conf.TronRing = contracts[strings.ToLower("TronRing")]

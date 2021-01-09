@@ -123,3 +123,13 @@ func BackingLock(extrinsicIndex string) *DarwiniaBackingLock {
 	}
 	return &d
 }
+
+func SetMMRIndexBestBlockNum(blockNum uint64) {
+	if blockNum > GetMMRIndexBestBlockNum() {
+		_ = util.SetCache("MMRIndexBestBlockNum", blockNum, 86400*180)
+	}
+}
+
+func GetMMRIndexBestBlockNum() uint64 {
+	return util.GetCacheUint64("MMRIndexBestBlockNum")
+}

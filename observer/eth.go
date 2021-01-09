@@ -79,9 +79,14 @@ func (e *EthTransaction) Redeem() error {
 
 		return db.AddRedeemRecord(Eth, util.AddHex(e.Result.TransactionHash), from, target, "deposit", amount,
 			int(util.U256(e.Result.BlockNumber).Int64()), int(util.U256(e.Result.TimeStamp).Int64()), util.ToString(deposit))
+
 	case VerifyProof:
 		blockNum := util.U256(logSlice[0]).Uint64()
 		return db.SetBackingLockConfirm(blockNum, util.AddHex(e.Result.TransactionHash))
+
+	case SetRootEvent:
+		index := util.U256(logSlice[2]).Uint64()
+		db.SetMMRIndexBestBlockNum(index)
 	}
 	return nil
 }

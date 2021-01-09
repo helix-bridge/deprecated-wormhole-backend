@@ -48,7 +48,7 @@ func locks() gin.HandlerFunc {
 		}
 		list, count := db.DarwiniaBackingLocks(p.Address, p.Page, p.Row)
 		c.JSON(http.StatusOK, JsonFormat(map[string]interface{}{
-			"list": list, "count": count, "implName": config.Link.ImplName,
+			"list": list, "count": count, "implName": config.Link.ImplName, "best": db.GetMMRIndexBestBlockNum(),
 		}, 0))
 	}
 }
