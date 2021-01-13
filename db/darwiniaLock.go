@@ -105,7 +105,7 @@ func MMRRootSigned(eventParams []parallel.EventParam) error {
 		signatureList = append(signatureList, signature.Col2)
 	}
 
-	query := util.DB.Model(DarwiniaBackingLock{}).Where("tx = ''").
+	query := util.DB.Model(DarwiniaBackingLock{}).Where("tx = ''").Where("block_num < ?", mmrIndex).
 		Update(DarwiniaBackingLock{MMRRoot: util.AddHex(mmrRoot), Signatures: strings.Join(signatureList, ","), MMRIndex: uint(mmrIndex)})
 	return query.Error
 }
