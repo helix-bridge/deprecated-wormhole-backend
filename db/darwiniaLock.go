@@ -1,6 +1,7 @@
 package db
 
 import (
+	"errors"
 	"github.com/darwinia-network/link/services/parallel"
 	"github.com/darwinia-network/link/util"
 	"github.com/shopspring/decimal"
@@ -49,6 +50,9 @@ func CreateDarwiniaBacking(extrinsicIndex string, detail *parallel.ExtrinsicDeta
 			record.MMRIndex = uint(util.StringToInt(util.ToString(event.Params[0].Value)))
 		}
 	}
+	if record.MMRIndex == 0 {
+		return errors.New("nil MMRIndex")
+	}
 
 	query := db.Create(&record)
 	return query.Error
@@ -68,20 +72,27 @@ func DarwiniaBackingLocks(accountId string, page, row int) ([]DarwiniaBackingLoc
 		if lock.MMRRoot != "" {
 			continue
 		}
-		logs := parallel.SubscanLogs(lock.MMRIndex + 1)
-		for _, logData := range logs {
-			if strings.ToLower(logData.LogType) == "other" {
-
-				var merkleMountainRangeRootLog *MerkleMountainRangeRootLog
-				util.UnmarshalAny(&merkleMountainRangeRootLog, logData.Data)
-				if merkleMountainRangeRootLog != nil {
-					_ = lock.setMMRRoot(merkleMountainRangeRootLog.ParentMmrRoot)
-					list[index].MMRRoot = merkleMountainRangeRootLog.ParentMmrRoot
-				}
-			}
+		if MMRRoot := queryMMRRoot(lock.MMRIndex + 1); MMRRoot != "" {
+			_ = lock.setMMRRoot(MMRRoot)
+			list[index].MMRRoot = MMRRoot
 		}
 	}
 	return list, count
+}
+
+func queryMMRRoot(blockNum uint) string {
+	logs := parallel.SubscanLogs(blockNum)
+
+	for _, logData := range logs {
+		if strings.EqualFold(logData.LogType, "other") {
+
+			var merkleMountainRangeRootLog *MerkleMountainRangeRootLog
+			if util.UnmarshalAny(&merkleMountainRangeRootLog, logData.Data); merkleMountainRangeRootLog != nil {
+				return merkleMountainRangeRootLog.ParentMmrRoot
+			}
+		}
+	}
+	return ""
 }
 
 func (l *DarwiniaBackingLock) setMMRRoot(mmrRoot string) error {
@@ -125,11 +136,19 @@ func BackingLock(extrinsicIndex string) *DarwiniaBackingLock {
 }
 
 func SetMMRIndexBestBlockNum(blockNum uint64) {
-	if blockNum > GetMMRIndexBestBlockNum() {
+	best, _ := GetMMRIndexBestBlockNum()
+	if blockNum > best {
 		_ = util.SetCache("MMRIndexBestBlockNum", blockNum, 86400*180)
+		_ = util.SetCache("MMRIndexBestMMRRoot", queryMMRRoot(uint(blockNum+1)), 86400*180)
 	}
 }
 
-func GetMMRIndexBestBlockNum() uint64 {
-	return util.GetCacheUint64("MMRIndexBestBlockNum")
+func GetMMRIndexBestBlockNum() (uint64, string) {
+	best := util.GetCacheUint64("MMRIndexBestBlockNum")
+	if MMRRoot := string(util.GetCache("MMRIndexBestMMRRoot")); MMRRoot == "" {
+		MMRRoot = queryMMRRoot(uint(best + 1))
+		return best, MMRRoot
+	} else {
+		return best, MMRRoot
+	}
 }
