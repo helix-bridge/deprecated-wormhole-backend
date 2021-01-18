@@ -51,7 +51,14 @@ func CreateDarwiniaBacking(extrinsicIndex string, detail *parallel.ExtrinsicDeta
 		}
 	}
 	if record.MMRIndex == 0 {
-		return errors.New("nil MMRIndex")
+		// latest MMRIndex
+		var recent DarwiniaBackingLock
+		if query := db.Model(DarwiniaBackingLock{}).Where("mmr_index > ", detail.BlockNum).Order("mmr_index asc").Limit(1).Find(&recent); !query.RecordNotFound() {
+			record.MMRIndex = recent.MMRIndex
+		} else {
+			return errors.New("nil MMRIndex")
+		}
+
 	}
 
 	query := db.Create(&record)
