@@ -70,6 +70,7 @@ type SubscanParams struct {
 	Call      string `json:"call"`
 	Module    string `json:"module"`
 	FromBlock int64  `json:"from_block"`
+	Finalized bool   `json:"finalized"`
 }
 
 type SubscanLog struct {
@@ -85,6 +86,7 @@ func SubscanEvents(moduleId, eventId string, startBlock int64) (list []SubscanEv
 		Call:      eventId,
 		Module:    moduleId,
 		FromBlock: startBlock,
+		Finalized: true,
 	}
 	bp, _ := json.Marshal(p)
 	raw, err := util.PostWithJson(url, bytes.NewReader(bp))
