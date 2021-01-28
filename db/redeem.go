@@ -69,6 +69,11 @@ func RedeemStat() map[string]interface{} {
 	r["kton"] = n.N.Div(pre)
 	db.Model(RedeemRecord{}).Select("sum(amount) as n").Where("currency = 'deposit'").Scan(&n)
 	r["deposit"] = n.N.Div(pre)
+
+	db.Model(DarwiniaBackingLock{}).Select("sum(ring_value) as n").Scan(&n)
+	r["d2e_ring"] = n.N.Div(decimal.New(1, 9))
+	db.Model(DarwiniaBackingLock{}).Select("sum(kton_value) as n").Scan(&n)
+	r["d2e_kton"] = n.N.Div(decimal.New(1, 9))
 	var count int
 	db.Model(RedeemRecord{}).Count(&count)
 	r["count"] = count
