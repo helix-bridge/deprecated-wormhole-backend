@@ -25,9 +25,9 @@ func redeem() gin.HandlerFunc {
 	}
 }
 
-func redeemStat() gin.HandlerFunc {
+func mappingStat() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, JsonFormat(db.RedeemStat(), 0))
+		c.JSON(http.StatusOK, JsonFormat(db.MappingStat(), 0))
 	}
 }
 

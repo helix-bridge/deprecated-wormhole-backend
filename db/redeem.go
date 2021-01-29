@@ -55,27 +55,40 @@ func GetRelayBestBlockNum() uint64 {
 	return util.GetCacheUint64("RelayBestBlockNum")
 }
 
-func RedeemStat() map[string]interface{} {
+type MappingTradeStat struct {
+	TxCount int                    `json:"tx_count"`
+	D2E     map[string]interface{} `json:"d2e"`
+	E2D     map[string]interface{} `json:"e2d"`
+}
+
+func MappingStat() *MappingTradeStat {
 	db := util.DB
 	type NSum struct {
 		N decimal.Decimal
 	}
 	var n NSum
 	pre := decimal.New(1, 18)
-	r := make(map[string]interface{})
+	var r MappingTradeStat
+	r.E2D = make(map[string]interface{})
 	db.Model(RedeemRecord{}).Select("sum(amount) as n").Where("currency = 'ring'").Scan(&n)
-	r["ring"] = n.N.Div(pre)
+	r.E2D["ring"] = n.N.Div(pre)
 	db.Model(RedeemRecord{}).Select("sum(amount) as n").Where("currency = 'kton'").Scan(&n)
-	r["kton"] = n.N.Div(pre)
+	r.E2D["kton"] = n.N.Div(pre)
 	db.Model(RedeemRecord{}).Select("sum(amount) as n").Where("currency = 'deposit'").Scan(&n)
-	r["deposit"] = n.N.Div(pre)
-
-	db.Model(DarwiniaBackingLock{}).Select("sum(ring_value) as n").Scan(&n)
-	r["d2e_ring"] = n.N.Div(decimal.New(1, 9))
-	db.Model(DarwiniaBackingLock{}).Select("sum(kton_value) as n").Scan(&n)
-	r["d2e_kton"] = n.N.Div(decimal.New(1, 9))
+	r.E2D["deposit"] = n.N.Div(pre)
 	var count int
 	db.Model(RedeemRecord{}).Count(&count)
-	r["count"] = count
-	return r
+	r.E2D["tx_count"] = count
+	r.TxCount = count
+
+	r.D2E = make(map[string]interface{})
+	db.Model(DarwiniaBackingLock{}).Select("sum(ring_value) as n").Scan(&n)
+	r.D2E["ring"] = n.N.Div(decimal.New(1, 9))
+	db.Model(DarwiniaBackingLock{}).Select("sum(kton_value) as n").Scan(&n)
+	r.D2E["kton"] = n.N.Div(decimal.New(1, 9))
+	db.Model(DarwiniaBackingLock{}).Count(&count)
+	r.D2E["tx_count"] = count
+	r.TxCount += count
+
+	return &r
 }

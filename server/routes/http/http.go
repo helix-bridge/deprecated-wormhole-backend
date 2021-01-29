@@ -18,7 +18,7 @@ func Run(server *gin.Engine) {
 	})
 	api.GET("ringBurn", ringBurn())
 	api.GET("redeem", redeem())
-	api.GET("redeem/stat", redeemStat())
+	api.GET("mapping/stat", cache.CachePage(store, time.Minute, mappingStat()))
 	api.GET("supply", cache.CachePage(store, time.Minute, ringSupply()))
 	api.GET("ethereumBacking/locks", locks())
 	api.GET("ethereumBacking/lock", lock())
