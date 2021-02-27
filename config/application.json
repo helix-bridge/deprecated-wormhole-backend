@@ -10,7 +10,7 @@
     "Kton": "0x9f284e1337a815fe77d2ff4ae46544645b20c5ff",
     "TronRing": "TL175uyihLqQD656aFx3uhHYe1tyGkmXaW",
     "TronKton": "TW3kTpVtYYQ5Ka1awZvLb9Yy6ZTDEC93dC",
-    "SubscanHost": "https://darwinia-cc1.subscan.io",
+    "SubscanHost": "https://darwinia.subscan.io",
     "ImplName": "Darwinia"
   },
   "dev": {
