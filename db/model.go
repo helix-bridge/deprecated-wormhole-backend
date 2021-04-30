@@ -12,6 +12,8 @@ func init() {
 			RedeemRecord{},
 			Subscriber{},
 			DarwiniaBackingLock{},
+			TokenRegisterRecord{},
+			TokenBurnRecord{},
 		)
 		db.Model(RingBurnRecord{}).AddUniqueIndex("tx", "tx")
 		db.Model(RingBurnRecord{}).AddIndex("address", "address")
@@ -19,5 +21,8 @@ func init() {
 		db.Model(RedeemRecord{}).AddIndex("address", "address")
 		db.Model(Subscriber{}).AddUniqueIndex("email", "email")
 		db.Model(DarwiniaBackingLock{}).AddIndex("target", "target")
+		db.Model(TokenRegisterRecord{}).AddIndex("source", "source")
+		// TODO replaced by sender
+		db.Model(TokenBurnRecord{}).AddIndex("recipient", "recipient")
 	}
 }

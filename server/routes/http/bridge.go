@@ -66,3 +66,35 @@ func lock() gin.HandlerFunc {
 		c.JSON(http.StatusOK, JsonFormat(db.BackingLock(p.ExtrinsicIndex), 0))
 	}
 }
+
+func erc20RegisterResponse() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		p := new(struct {
+			Source string `json:"source" binding:"required" form:"source"`
+		})
+		if err := c.ShouldBindQuery(p); err != nil {
+			c.JSON(http.StatusOK, JsonFormat(nil, 1001))
+			return
+		}
+		c.JSON(http.StatusOK, JsonFormat(db.TokenRegisterRecordInfo(p.Source), 0))
+	}
+}
+
+func erc20TokenBurns() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		p := new(struct {
+			Sender string `json:"sender" binding:"required" form:"sender"`
+			Page   int    `json:"page" form:"page"`
+			Row    int    `json:"row" binding:"required" form:"row"`
+		})
+		if err := c.ShouldBindQuery(p); err != nil {
+			c.JSON(http.StatusOK, JsonFormat(nil, 1001))
+			return
+		}
+		list, count := db.TokenBurnRecords(p.Sender, p.Page, p.Row)
+		best, MMRRoot := db.GetMMRIndexBestBlockNum()
+		c.JSON(http.StatusOK, JsonFormat(map[string]interface{}{
+			"list": list, "count": count, "implName": config.Link.ImplName, "best": best, "MMRRoot": MMRRoot,
+		}, 0))
+	}
+}

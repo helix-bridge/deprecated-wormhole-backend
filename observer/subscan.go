@@ -12,7 +12,7 @@ type SubscanEvent struct {
 	EventId  string
 	ModuleId string
 	Result   *parallel.SubscanEvent
-	Last     int64 `json:"last"`
+	Last	 int64 `json:"last"`
 }
 
 func (s *SubscanEvent) Do(o Observable) error {
@@ -46,7 +46,7 @@ func (s *SubscanEvent) Listen(o Observable) error {
 
 type EthereumTransactionIndex struct {
 	BlockHash string `json:"col1"`
-	Index     int    `json:"col2"`
+	Index	 int    `json:"col2"`
 }
 
 func (s *SubscanEvent) Process() error {
@@ -71,6 +71,15 @@ func (s *SubscanEvent) Process() error {
 		}
 	case strings.ToLower("EthereumRelayAuthorities"):
 		_ = db.MMRRootSigned(s.Result.Params)
+	    _ = db.MMRRootSignedForTokenRegistration(s.Result.Params)
+	case strings.ToLower("EthereumIssuing"):
+	    extrinsic := parallel.SubscanExtrinsic(s.Result.ExtrinsicIndex)
+	    switch s.Result.EventId {
+	    case "TokenRegistered":
+	        _ = db.CreateTokenRegisterRecord(s.Result.ExtrinsicIndex, extrinsic)
+	    case "BurnToken":
+	        _ = db.CreateTokenBurnRecord(s.Result.ExtrinsicIndex, extrinsic)
+	    }
 	}
 	return nil
 }

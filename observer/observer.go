@@ -56,6 +56,7 @@ func Run() {
 		&SubscanEvent{ModuleId: "ethereumrelay", EventId: "PendingRelayHeaderParcelConfirmed"},
 		&SubscanEvent{ModuleId: "ethereumbacking"},
 		&SubscanEvent{ModuleId: "ethereumrelayauthorities", EventId: "MMRRootSigned"},
+		&SubscanEvent{ModuleId: "ethereumissuing"},
 	)
 	_ = subject.Run()
 }

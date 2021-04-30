@@ -82,7 +82,9 @@ func (e *EthTransaction) Redeem() error {
 
 	case VerifyProof:
 		blockNum := util.U256(logSlice[0]).Uint64()
-		return db.SetBackingLockConfirm(blockNum, util.AddHex(e.Result.TransactionHash))
+		db.SetTokenTokenRegistrationConfirm(blockNum, util.AddHex(e.Result.TransactionHash))
+		db.SetBackingLockConfirm(blockNum, util.AddHex(e.Result.TransactionHash))
+		return nil
 
 	case SetRootEvent:
 		index := util.U256(logSlice[2]).Uint64()

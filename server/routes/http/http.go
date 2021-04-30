@@ -22,6 +22,8 @@ func Run(server *gin.Engine) {
 	api.GET("supply", cache.CachePage(store, time.Minute, ringSupply()))
 	api.GET("ethereumBacking/locks", locks())
 	api.GET("ethereumBacking/lock", lock())
+	api.GET("ethereumIssuing/register", erc20RegisterResponse())
+	api.GET("ethereumIssuing/burns", erc20TokenBurns())
 	api.POST("/subscribe", subscribe())
 }
 
