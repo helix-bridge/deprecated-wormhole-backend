@@ -35,8 +35,7 @@ type TokenBurnRecord struct {
 	Backing        string          `json:"backing" sql:"default: null;size:100"`
 	Source         string          `json:"source" sql:"default: null;size:100"`
 	Target         string          `json:"target" sql:"default: null;size:100"`
-    // TODO
-	//Sender         string          `json:"sender" sql:"default: null;size:100"`
+	Sender         string          `json:"sender" sql:"default: null;size:100"`
 	Recipient      string          `json:"recipient" sql:"default: null;size:100"`
 	Value          decimal.Decimal `json:"value" sql:"type:decimal(30,0);"`
 	BlockTimestamp int             `json:"block_timestamp"`
@@ -95,12 +94,12 @@ func CreateTokenBurnRecord(extrinsicIndex string, detail *parallel.ExtrinsicDeta
 	for _, event := range detail.Event {
 		switch event.EventId {
 		case "BurnToken":
-            // TODO add sender
 			record.Backing = util.AddHex(util.ToString(event.Params[1].Value))
-			record.Recipient  = util.AddHex(util.ToString(event.Params[2].Value))
-			record.Source  = util.AddHex(util.ToString(event.Params[3].Value))
-			record.Target  = util.AddHex(util.ToString(event.Params[4].Value))
-			record.Value  = util.DecimalFromInterface(event.Params[5].Value)
+			record.Sender = util.AddHex(util.ToString(event.Params[2].Value))
+			record.Recipient  = util.AddHex(util.ToString(event.Params[3].Value))
+			record.Source  = util.AddHex(util.ToString(event.Params[4].Value))
+			record.Target  = util.AddHex(util.ToString(event.Params[5].Value))
+			record.Value  = util.DecimalFromInterface(event.Params[6].Value)
 		case "ScheduleMMRRoot":
 			record.MMRIndex = uint(util.StringToInt(util.ToString(event.Params[0].Value)))
 		}
@@ -168,9 +167,8 @@ func (r *TokenBurnRecord) setMMRRoot(mmrRoot string) error {
 func TokenBurnRecords(sender string, page, row int) ([]TokenBurnRecord, int) {
 	var list []TokenBurnRecord
 	var count int
-    // TODO replace recipient by sender
-	util.DB.Model(TokenBurnRecord{}).Where("recipient = ?", sender).Count(&count)
-	util.DB.Where("recipient = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	util.DB.Model(TokenBurnRecord{}).Where("sender = ?", sender).Count(&count)
+	util.DB.Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
 
 	for index, burned := range list {
 		if burned.MMRRoot != "" {

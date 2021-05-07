@@ -25,6 +25,7 @@
     "TronRing": "TL175uyihLqQD656aFx3uhHYe1tyGkmXaW",
     "TronKton": "TW3kTpVtYYQ5Ka1awZvLb9Yy6ZTDEC93dC",
     "SubscanHost": "https://pangolin.subscan.io",
-    "ImplName": "Pangolin"
+    "ImplName": "Pangolin",
+    "EthereumBacking": "0xb2Bea2358d817dAE01B0FD0DC3aECB25910E65AA"
   }
 }
