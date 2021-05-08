@@ -46,7 +46,7 @@ func (s *SubscanEvent) Listen(o Observable) error {
 
 type EthereumTransactionIndex struct {
 	BlockHash string `json:"col1"`
-	Index	 int    `json:"col2"`
+	Index	 int	`json:"col2"`
 }
 
 func (s *SubscanEvent) Process() error {
@@ -71,15 +71,25 @@ func (s *SubscanEvent) Process() error {
 		}
 	case strings.ToLower("EthereumRelayAuthorities"):
 		_ = db.MMRRootSigned(s.Result.Params)
-	    _ = db.MMRRootSignedForTokenRegistration(s.Result.Params)
+		_ = db.MMRRootSignedForTokenRegistration(s.Result.Params)
 	case strings.ToLower("EthereumIssuing"):
-	    extrinsic := parallel.SubscanExtrinsic(s.Result.ExtrinsicIndex)
-	    switch s.Result.EventId {
-	    case "TokenRegistered":
-	        _ = db.CreateTokenRegisterRecord(s.Result.ExtrinsicIndex, extrinsic)
-	    case "BurnToken":
-	        _ = db.CreateTokenBurnRecord(s.Result.ExtrinsicIndex, extrinsic)
-	    }
+		extrinsic := parallel.SubscanExtrinsic(s.Result.ExtrinsicIndex)
+		switch s.Result.EventId {
+		case "TokenRegistered":
+			_ = db.CreateTokenRegisterRecord(s.Result.ExtrinsicIndex, extrinsic)
+		case "BurnToken":
+			_ = db.CreateTokenBurnRecord(s.Result.ExtrinsicIndex, extrinsic)
+		case "RedeemErc20":
+			for _, param := range s.Result.Params {
+				if strings.EqualFold(param.Type, "EthereumTransactionIndex") {
+					var t EthereumTransactionIndex
+					util.UnmarshalAny(&t, param.Value)
+					if fromTx := parallel.EthGetTransactionByBlockHashAndIndex(t.BlockHash, util.IntFromInterface(t.Index)); fromTx != "" {
+						db.UpdateEthereumLockRecord(fromTx, s.Result.ExtrinsicIndex)
+					}
+				}
+			}
+		}
 	}
 	return nil
 }

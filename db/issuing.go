@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/darwinia-network/link/services/parallel"
 	"github.com/darwinia-network/link/util"
-	"github.com/shopspring/decimal"
 	"strings"
 	"time"
 )
@@ -37,7 +36,7 @@ type TokenBurnRecord struct {
 	Target         string          `json:"target" sql:"default: null;size:100"`
 	Sender         string          `json:"sender" sql:"default: null;size:100"`
 	Recipient      string          `json:"recipient" sql:"default: null;size:100"`
-	Value          decimal.Decimal `json:"value" sql:"type:decimal(30,0);"`
+	Value          string          `json:"value" sql:"default: null;size:100"`
 	BlockTimestamp int             `json:"block_timestamp"`
 	MMRIndex       uint            `json:"mmr_index"`
 	MMRRoot        string          `json:"mmr_root"`
@@ -99,7 +98,7 @@ func CreateTokenBurnRecord(extrinsicIndex string, detail *parallel.ExtrinsicDeta
 			record.Recipient  = util.AddHex(util.ToString(event.Params[3].Value))
 			record.Source  = util.AddHex(util.ToString(event.Params[4].Value))
 			record.Target  = util.AddHex(util.ToString(event.Params[5].Value))
-			record.Value  = util.DecimalFromInterface(event.Params[6].Value)
+			record.Value  = util.AddHex(util.ToString(event.Params[6].Value))
 		case "ScheduleMMRRoot":
 			record.MMRIndex = uint(util.StringToInt(util.ToString(event.Params[0].Value)))
 		}

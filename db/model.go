@@ -24,6 +24,6 @@ func init() {
 		db.Model(DarwiniaBackingLock{}).AddIndex("target", "target")
 		db.Model(TokenRegisterRecord{}).AddIndex("source", "source")
 		db.Model(TokenBurnRecord{}).AddIndex("sender", "sender")
-		db.Model(EthereumLockRecord{}).AddIndex("from", "from")
+		db.Model(EthereumLockRecord{}).AddIndex("sender", "sender")
 	}
 }

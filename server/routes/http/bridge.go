@@ -98,3 +98,21 @@ func erc20TokenBurns() gin.HandlerFunc {
 		}, 0))
 	}
 }
+
+func tokenLock() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		p := new(struct {
+			Sender string `json:"sender" binding:"required" form:"sender"`
+			Page   int    `json:"page" form:"page"`
+			Row    int    `json:"row" binding:"required" form:"row"`
+		})
+		if err := c.ShouldBindQuery(p); err != nil {
+			c.JSON(http.StatusOK, JsonFormat(nil, 1001))
+			return
+		}
+		list, count := db.EthereumLockList(p.Sender, p.Page, p.Row)
+		c.JSON(http.StatusOK, JsonFormat(map[string]interface{}{
+			"list": list, "count": count, "implName": config.Link.ImplName}, 0))
+	}
+}
+
