@@ -11,7 +11,7 @@ type EthereumLockRecord struct {
 	CreatedAt      time.Time       `json:"-"`
 	Chain          string          `json:"chain"`
 	Tx             string          `json:"tx" sql:"size:100"`
-    Token          string          `json:"token", sql:"size:100"`
+	Token          string          `json:"token", sql:"size:100"`
 	Sender         string          `json:"sender" sql:"size:100"`
 	Receiver       string          `json:"receiver" sql:"size:100"`
 	BlockNum       int             `json:"block_num"`

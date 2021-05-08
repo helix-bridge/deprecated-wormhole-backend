@@ -12,7 +12,7 @@ type SubscanEvent struct {
 	EventId  string
 	ModuleId string
 	Result   *parallel.SubscanEvent
-	Last	 int64 `json:"last"`
+	Last     int64 `json:"last"`
 }
 
 func (s *SubscanEvent) Do(o Observable) error {
@@ -46,7 +46,7 @@ func (s *SubscanEvent) Listen(o Observable) error {
 
 type EthereumTransactionIndex struct {
 	BlockHash string `json:"col1"`
-	Index	 int	`json:"col2"`
+	Index     int    `json:"col2"`
 }
 
 func (s *SubscanEvent) Process() error {

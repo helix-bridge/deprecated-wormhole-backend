@@ -12,9 +12,9 @@ import (
 )
 
 type EthTransaction struct {
-	Last	int64					 `json:"last"`
-	Address string					`json:"address"`
-	Method  []string				  `json:"method"`
+	Last	int64                     `json:"last"`
+	Address string                    `json:"address"`
+	Method  []string                  `json:"method"`
 	Result  *parallel.EtherscanResult `json:"result"`
 }
 

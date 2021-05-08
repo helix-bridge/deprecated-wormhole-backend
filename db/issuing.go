@@ -134,18 +134,18 @@ func MMRRootSignedForTokenRegistration(eventParams []parallel.EventParam) error 
 		Update(TokenRegisterRecord{MMRRoot: util.AddHex(mmrRoot), Signatures: strings.Join(signatureList, ","), MMRIndex: uint(mmrIndex)})
 	queryBurned := util.DB.Model(TokenBurnRecord{}).Where("tx = ''").Where("block_num < ?", mmrIndex).
 		Update(TokenBurnRecord{MMRRoot: util.AddHex(mmrRoot), Signatures: strings.Join(signatureList, ","), MMRIndex: uint(mmrIndex)})
-    if queryRegister.Error != nil && queryBurned.Error != nil {
-        return errors.New("operator db failed")
-    }
+	if queryRegister.Error != nil && queryBurned.Error != nil {
+		return errors.New("operator db failed")
+	}
 	return nil
 }
 
 func SetTokenTokenRegistrationConfirm(blockNum uint64, tx string) error {
 	queryRegister := util.DB.Model(TokenRegisterRecord{}).Where("block_num = ?", blockNum).Update(TokenRegisterRecord{Tx: tx})
 	queryBurned := util.DB.Model(TokenBurnRecord{}).Where("block_num = ?", blockNum).Update(TokenBurnRecord{Tx: tx})
-    if queryRegister.Error != nil && queryBurned.Error != nil {
-        return errors.New("operator db failed")
-    }
+	if queryRegister.Error != nil && queryBurned.Error != nil {
+		return errors.New("operator db failed")
+	}
 	return nil
 }
 
