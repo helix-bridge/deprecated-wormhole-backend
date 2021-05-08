@@ -140,7 +140,7 @@ func MMRRootSignedForTokenRegistration(eventParams []parallel.EventParam) error 
 	return nil
 }
 
-func SetTokenTokenRegistrationConfirm(blockNum uint64, tx string) error {
+func SetTokenRegistrationConfirm(blockNum uint64, tx string) error {
 	queryRegister := util.DB.Model(TokenRegisterRecord{}).Where("block_num = ?", blockNum).Update(TokenRegisterRecord{Tx: tx})
 	queryBurned := util.DB.Model(TokenBurnRecord{}).Where("block_num = ?", blockNum).Update(TokenBurnRecord{Tx: tx})
 	if queryRegister.Error != nil && queryBurned.Error != nil {

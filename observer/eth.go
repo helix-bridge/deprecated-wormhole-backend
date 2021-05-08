@@ -83,7 +83,7 @@ func (e *EthTransaction) Redeem() error {
 	case VerifyProof:
 		blockNum := util.U256(logSlice[0]).Uint64()
 		if e.Address == config.Link.EthereumBacking {
-			db.SetTokenTokenRegistrationConfirm(blockNum, util.AddHex(e.Result.TransactionHash))
+			db.SetTokenRegistrationConfirm(blockNum, util.AddHex(e.Result.TransactionHash))
 		} else if e.Address == config.Link.TokenIssuing {
 			db.SetBackingLockConfirm(blockNum, util.AddHex(e.Result.TransactionHash))
 		}
@@ -95,10 +95,11 @@ func (e *EthTransaction) Redeem() error {
 
 	case BackingLock:
 		sender := util.AddHex(e.Result.Topics[1][len(e.Result.Topics[1])-40:])
-		receiver := util.AddHex(logSlice[2][len(logSlice[2])-40:])
-		amount := decimal.NewFromBigInt(util.U256(logSlice[1]), 0)
-		token := util.AddHex(logSlice[0][len(logSlice[0])-40:])
-		return db.AddEthereumLockRecord(Eth, util.AddHex(e.Result.TransactionHash), token, sender, receiver, amount,
+		receiver := util.AddHex(logSlice[3][len(logSlice[3])-40:])
+		amount := decimal.NewFromBigInt(util.U256(logSlice[2]), 0)
+		source := util.AddHex(logSlice[0][len(logSlice[0])-40:])
+		target := util.AddHex(logSlice[1][len(logSlice[1])-40:])
+		return db.AddEthereumLockRecord(Eth, util.AddHex(e.Result.TransactionHash), source, target, sender, receiver, amount,
 			int(util.U256(e.Result.BlockNumber).Int64()), int(util.U256(e.Result.TimeStamp).Int64()))
 	}
 	return nil

@@ -11,7 +11,8 @@ type EthereumLockRecord struct {
 	CreatedAt      time.Time       `json:"-"`
 	Chain          string          `json:"chain"`
 	Tx             string          `json:"tx" sql:"size:100"`
-	Token          string          `json:"token", sql:"size:100"`
+	Source         string          `json:"source", sql:"size:100"`
+	Target         string          `json:"target", sql:"size:100"`
 	Sender         string          `json:"sender" sql:"size:100"`
 	Receiver       string          `json:"receiver" sql:"size:100"`
 	BlockNum       int             `json:"block_num"`
@@ -21,10 +22,10 @@ type EthereumLockRecord struct {
 	IsRelayed      bool            `json:"is_relayed" gorm:"-"`
 }
 
-func AddEthereumLockRecord(chain, tx, token, sender, receiver string, amount decimal.Decimal, blockNum, blockTimestamp int) error {
+func AddEthereumLockRecord(chain, tx, source, target, sender, receiver string, amount decimal.Decimal, blockNum, blockTimestamp int) error {
 	db := util.DB
 	query := db.Create(&EthereumLockRecord{
-        Chain: chain, Tx: tx, Token: token, Sender: sender, Receiver: receiver, Amount: amount, BlockNum: blockNum,
+        Chain: chain, Tx: tx, Source: source, Target: target, Sender: sender, Receiver: receiver, Amount: amount, BlockNum: blockNum,
 		BlockTimestamp: blockTimestamp,
 	})
 	return query.Error
