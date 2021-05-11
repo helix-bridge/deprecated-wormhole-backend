@@ -93,6 +93,9 @@ func CreateTokenBurnRecord(extrinsicIndex string, detail *parallel.ExtrinsicDeta
 	for _, event := range detail.Event {
 		switch event.EventId {
 		case "BurnToken":
+			if len(event.Params) < 7 {
+				return errors.New("invalid event params length")
+            }
 			record.Backing = util.AddHex(util.ToString(event.Params[1].Value))
 			record.Sender = util.AddHex(util.ToString(event.Params[2].Value))
 			record.Recipient  = util.AddHex(util.ToString(event.Params[3].Value))
