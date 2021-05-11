@@ -12,7 +12,7 @@ import (
 )
 
 type EthTransaction struct {
-	Last    int64                     `json:"last"`
+	Last	int64                     `json:"last"`
 	Address string                    `json:"address"`
 	Method  []string                  `json:"method"`
 	Result  *parallel.EtherscanResult `json:"result"`
@@ -82,11 +82,25 @@ func (e *EthTransaction) Redeem() error {
 
 	case VerifyProof:
 		blockNum := util.U256(logSlice[0]).Uint64()
-		return db.SetBackingLockConfirm(blockNum, util.AddHex(e.Result.TransactionHash))
+		if e.Address == config.Link.EthereumBacking {
+			db.SetTokenRegistrationConfirm(blockNum, util.AddHex(e.Result.TransactionHash))
+		} else if e.Address == config.Link.TokenIssuing {
+			db.SetBackingLockConfirm(blockNum, util.AddHex(e.Result.TransactionHash))
+		}
+		return nil
 
 	case SetRootEvent:
 		index := util.U256(logSlice[2]).Uint64()
 		db.SetMMRIndexBestBlockNum(index)
+
+	case BackingLock:
+		sender := util.AddHex(e.Result.Topics[1][len(e.Result.Topics[1])-40:])
+		receiver := util.AddHex(logSlice[3][len(logSlice[3])-40:])
+		amount := decimal.NewFromBigInt(util.U256(logSlice[2]), 0)
+		source := util.AddHex(logSlice[0][len(logSlice[0])-40:])
+		target := util.AddHex(logSlice[1][len(logSlice[1])-40:])
+		return db.AddEthereumLockRecord(Eth, util.AddHex(e.Result.TransactionHash), source, target, sender, receiver, amount,
+			int(util.U256(e.Result.BlockNumber).Int64()), int(util.U256(e.Result.TimeStamp).Int64()))
 	}
 	return nil
 }

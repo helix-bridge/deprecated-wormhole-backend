@@ -23,6 +23,7 @@ type ApplicationConf struct {
 	TronKton        string
 	SubscanHost     string
 	ImplName        string
+	EthereumBacking string
 }
 
 func LoadConf() {
@@ -54,5 +55,6 @@ func LoadConf() {
 	conf.TronKton = contracts[strings.ToLower("TronKton")]
 	conf.SubscanHost = contracts[strings.ToLower("SubscanHost")]
 	conf.ImplName = contracts[strings.ToLower("ImplName")]
+	conf.EthereumBacking = contracts[strings.ToLower("EthereumBacking")]
 	Link = conf
 }
