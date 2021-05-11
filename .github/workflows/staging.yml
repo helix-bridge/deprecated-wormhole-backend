@@ -1,7 +1,7 @@
 name: Staging
 on:
   push:
-    branches: [master, feature/github-actions]
+    branches: [pangolin]
 
 jobs:
   build-and-deploy:
