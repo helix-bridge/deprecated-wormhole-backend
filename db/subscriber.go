@@ -16,3 +16,14 @@ func CreateSubscribe(email string) error {
 	query := db.Create(&Subscriber{Email: email})
 	return query.Error
 }
+
+type PloSubscriber struct {
+	Email      string `gorm:"type:varchar(64);" json:"email" `
+	KsmAddress string `json:"ksm_address"`
+}
+
+func CreatePloSubscriber(email, address string) error {
+	db := util.DB
+	query := db.Create(&PloSubscriber{Email: email, KsmAddress: address})
+	return query.Error
+}

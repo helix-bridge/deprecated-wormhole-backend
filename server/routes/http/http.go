@@ -23,6 +23,7 @@ func Run(server *gin.Engine) {
 	api.GET("ethereumBacking/locks", locks())
 	api.GET("ethereumBacking/lock", lock())
 	api.POST("/subscribe", subscribe())
+	api.POST("/plo/subscribe", ploSubscribe())
 }
 
 func JsonFormat(data interface{}, code int) map[string]interface{} {
