@@ -161,7 +161,7 @@ func PostWithApiKey(url string, body io.Reader) ([]byte, error) {
 	client := &http.Client{}
 	req, _ := http.NewRequest("POST", url, body)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-API-Key", util.GetEnv("SUBSCAN_API_KEY", ""))
+	req.Header.Set("X-API-Key", util.GetEnv("SUBSCAN_API_KEY", "16325b647dbe652fd9fa73ceaaa8aa83"))
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
