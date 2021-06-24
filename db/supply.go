@@ -130,7 +130,7 @@ func (c *Currency) TotalSupply() decimal.Decimal {
 		} `json:"data"`
 	}
 	var res SubscanTokenRes
-	b, _ := util.HttpGet("https://darwinia-cc1.subscan.io/api/scan/token")
+	b, _ := util.HttpGet(fmt.Sprintf("%s/api/scan/token", config.Link.SubscanHost))
 	util.UnmarshalAny(&res, b)
 	detail := res.Data.Detail[strings.ToUpper(c.Code)]
 	return detail.TotalIssuance.Div(decimal.New(1, int32(detail.TokenDecimals)))

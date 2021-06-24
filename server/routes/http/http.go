@@ -26,6 +26,7 @@ func Run(server *gin.Engine) {
 	api.GET("ethereumIssuing/register", erc20RegisterResponse())
 	api.GET("ethereumIssuing/burns", erc20TokenBurns())
 	api.POST("/subscribe", subscribe())
+	api.POST("/plo/subscribe", ploSubscribe())
 }
 
 func JsonFormat(data interface{}, code int) map[string]interface{} {

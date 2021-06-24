@@ -1,10 +1,12 @@
 package util
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/shopspring/decimal"
 	"strconv"
+	"strings"
 )
 
 func IntToString(i int) string {
@@ -12,6 +14,13 @@ func IntToString(i int) string {
 }
 func Int64ToString(i int64) string {
 	return strconv.FormatInt(i, 10)
+}
+
+func HexToBytes(s string) []byte {
+	s = strings.TrimPrefix(s, "0x")
+	c := make([]byte, hex.DecodedLen(len(s)))
+	_, _ = hex.Decode(c, []byte(s))
+	return c
 }
 
 func ToString(i interface{}) string {

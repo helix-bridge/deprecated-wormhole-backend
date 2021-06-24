@@ -10,7 +10,7 @@
     "Kton": "0x9f284e1337a815fe77d2ff4ae46544645b20c5ff",
     "TronRing": "TL175uyihLqQD656aFx3uhHYe1tyGkmXaW",
     "TronKton": "TW3kTpVtYYQ5Ka1awZvLb9Yy6ZTDEC93dC",
-    "SubscanHost": "https://darwinia.subscan.io",
+    "SubscanHost": "https://darwinia.api.subscan.io",
     "ImplName": "Darwinia"
   },
   "dev": {
@@ -24,7 +24,7 @@
     "Kton": "0x1994100c58753793D52c6f457f189aa3ce9cEe94",
     "TronRing": "TL175uyihLqQD656aFx3uhHYe1tyGkmXaW",
     "TronKton": "TW3kTpVtYYQ5Ka1awZvLb9Yy6ZTDEC93dC",
-    "SubscanHost": "https://pangolin.subscan.io",
+    "SubscanHost": "https://pangolin.api.subscan.io",
     "ImplName": "Pangolin",
     "EthereumBacking": "0xb2Bea2358d817dAE01B0FD0DC3aECB25910E65AA"
   }

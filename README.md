@@ -224,3 +224,23 @@ mainnet host: http://api.darwinia.network/
   "msg": "ok"
 }
 ```
+
+#### plo-subscribe
+
+`POST api/plo/subscribe`
+
+| name   | type   | require |
+| ------ | ------ | ------- |
+| address |  string | yes     |
+| email |  string | yes     |
+
+
+### Example Response
+
+`200 OK` and
+```json
+{
+  "code": 0,
+  "msg": "ok"
+}
+```

@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"github.com/darwinia-network/link/config"
 	"github.com/darwinia-network/link/util"
+	"io"
+	"io/ioutil"
+	"net/http"
 	"strings"
 )
 
@@ -89,7 +92,7 @@ func SubscanEvents(moduleId, eventId string, startBlock int64) (list []SubscanEv
 		Finalized: true,
 	}
 	bp, _ := json.Marshal(p)
-	raw, err := util.PostWithJson(url, bytes.NewReader(bp))
+	raw, err := PostWithApiKey(url, bytes.NewReader(bp))
 	if err != nil {
 		return nil
 	}
@@ -112,7 +115,7 @@ type ExtrinsicDetail struct {
 func SubscanExtrinsic(extrinsicIndex string) *ExtrinsicDetail {
 	var res SubscanExtrinsicRes
 	url := fmt.Sprintf("%s/api/scan/extrinsic", config.Link.SubscanHost)
-	raw, err := util.PostWithJson(url, strings.NewReader(fmt.Sprintf(`{"extrinsic_index":"%s"}`, extrinsicIndex)))
+	raw, err := PostWithApiKey(url, strings.NewReader(fmt.Sprintf(`{"extrinsic_index":"%s"}`, extrinsicIndex)))
 
 	if err != nil {
 		return nil
@@ -135,7 +138,7 @@ func SubscanExtrinsic(extrinsicIndex string) *ExtrinsicDetail {
 func SubscanLogs(blockNum uint) []SubscanLog {
 	var res SubscanLogsRes
 	url := fmt.Sprintf("%s/api/scan/logs", config.Link.SubscanHost)
-	raw, err := util.PostWithJson(url, strings.NewReader(fmt.Sprintf(`{"block_num":%d}`, blockNum)))
+	raw, err := PostWithApiKey(url, strings.NewReader(fmt.Sprintf(`{"block_num":%d}`, blockNum)))
 	if err != nil {
 		return nil
 	}
@@ -146,10 +149,26 @@ func SubscanLogs(blockNum uint) []SubscanLog {
 func SubscanBlockHeader(blockNum uint) *BlockHeader {
 	var res SubscanBlockHeaderRes
 	url := fmt.Sprintf("%s/api/scan/header", config.Link.SubscanHost)
-	raw, err := util.PostWithJson(url, strings.NewReader(fmt.Sprintf(`{"block_num":%d}`, blockNum)))
+	raw, err := PostWithApiKey(url, strings.NewReader(fmt.Sprintf(`{"block_num":%d}`, blockNum)))
 	if err != nil {
 		return nil
 	}
 	util.UnmarshalAny(&res, raw)
 	return res.Data
+}
+
+func PostWithApiKey(url string, body io.Reader) ([]byte, error) {
+	client := &http.Client{}
+	req, _ := http.NewRequest("POST", url, body)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-API-Key", util.GetEnv("SUBSCAN_API_KEY", "16325b647dbe652fd9fa73ceaaa8aa83"))
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.Body == nil {
+		return nil, fmt.Errorf("empty response")
+	}
+	defer resp.Body.Close()
+	return ioutil.ReadAll(resp.Body)
 }
