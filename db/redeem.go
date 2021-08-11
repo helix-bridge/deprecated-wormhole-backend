@@ -31,13 +31,16 @@ func AddRedeemRecord(chain, tx, address, target, currency string, amount decimal
 	return query.Error
 }
 
-func RedeemList(address string) (list []RedeemRecord) {
+func RedeemList(address string, page, row int) ([]RedeemRecord, int) {
 	db := util.DB
-	db.Model(list).Where("address = ?", address).Order("block_num desc").Find(&list)
+	var list []RedeemRecord
+	var count int
+	db.Model(RedeemRecord{}).Where("address = ?", address).Count(&count)
+	db.Where("address = ?", address).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
 	for index, value := range list {
 		list[index].IsRelayed = GetRelayBestBlockNum() >= uint64(value.BlockNum)
 	}
-	return
+	return list, count
 }
 
 func UpdateRedeem(tx, darwiniaTx string) {
