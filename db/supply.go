@@ -43,7 +43,7 @@ func RingSupply() *Supply {
 	}
 	ring.FilterAddress = map[string][]string{
 		"Tron":     {"TDWzV6W1L1uRcJzgg2uKa992nAReuDojfQ", "TSu1fQKFkTv95U312R6E94RMdixsupBZDS", "TTW2Vpr9TCu6gxGZ1yjwqy7R79hEH8iscC"},
-		"Ethereum": {"0x4710573b853fdd3561cb4f60ec9394f0155d5105", "0x7f23e4a473db3d11d11b43d90b34f8a778753e34", "0x649fdf6ee483a96e020b889571e93700fbd82d88"},
+		"Ethereum": {"0x5FD8bCC6180eCd977813465bDd0A76A5a9F88B47", "0xfA4FE04f69F87859fCB31dF3B9469f4E6447921c", "0x7f23e4a473db3d11d11b43d90b34f8a778753e34", "0x649fdf6ee483a96e020b889571e93700fbd82d88"},
 	}
 	return ring.supply()
 }
