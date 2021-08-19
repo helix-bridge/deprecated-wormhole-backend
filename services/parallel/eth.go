@@ -43,14 +43,14 @@ func RingEthBalance(contract, address string) *big.Int {
 	return util.U256(e.Result)
 }
 
-func EtherscanLog(start int64, address string, methods ...string) (*Etherscan, error) {
+func EtherscanLog(start, to int64, address string, methods ...string) (*Etherscan, error) {
 	w := web3.New("eth")
 	var e Etherscan
 	var topics []string
 	for _, method := range methods {
 		topics = append(topics, util.AddHex(hex.EncodeToString(crypto.SoliditySHA3(crypto.String(method)))))
 	}
-	if err := w.Event(&e, start, address, topics...); err != nil || e.Message != "OK" {
+	if err := w.Event(&e, start, to, address, topics...); err != nil || e.Message != "OK" {
 		return nil, err
 	}
 	return &e, nil

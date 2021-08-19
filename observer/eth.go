@@ -6,6 +6,7 @@ import (
 	"github.com/darwinia-network/link/db"
 	"github.com/darwinia-network/link/services/parallel"
 	"github.com/darwinia-network/link/util"
+	"github.com/darwinia-network/link/util/log"
 	"github.com/shopspring/decimal"
 	"strings"
 	"time"
@@ -16,39 +17,122 @@ type EthTransaction struct {
 	Address string                    `json:"address"`
 	Method  []string                  `json:"method"`
 	Result  *parallel.EtherscanResult `json:"result"`
+	ch chan interface{}
+}
+
+func (e *EthTransaction) RelyOn() bool {
+    return VerifyProof == e.Result.Topics[0]
+}
+
+func (e *EthTransaction) LoadData(o Observable, isRely bool) {
+    needSync := func() bool {
+	return isRely == e.RelyOn()
+    }
+
+    ethfrom := util.StringToInt64(string(util.HgetCache("restart", "ethfrom")))
+    ethto := util.StringToInt64(string(util.HgetCache("restart", "ethto")))
+
+    key := strings.Join(e.Method, ":")
+    log.Info("eth start to load init data", "key", key, "isrely", isRely, "ethfrom", ethfrom, "ethto", ethto)
+    for {
+	if ethfrom >= ethto {
+	    break
+	}
+	if eventLog, _ := parallel.EtherscanLog(ethfrom, ethfrom + 102400, e.Address, e.Method...); eventLog != nil {
+	    for _, result := range eventLog.Result {
+		e.Result = &result
+		ethfrom = util.U256(result.BlockNumber).Int64()
+		if ethfrom > ethto {
+		    break
+		}
+		if !needSync() {
+		    continue
+		}
+		_ = o.notify(e)
+	    }
+	}
+	ethfrom = ethfrom + 102400
+	time.Sleep(1 * time.Second)
+    }
+    log.Info("finish to load data", "key", key, "isrely", isRely, "ethfrom", ethfrom, "ethto", ethto)
+    e.Last = ethto
 }
 
 func (e *EthTransaction) Do(o Observable) error {
-	fmt.Println("find EthTransaction", e.Result)
 	if e.Result == nil || !util.StringInSlice(e.Result.Topics[0], EthAvailableEvent) {
 		return fmt.Errorf("empty transaction %s", e.Result)
 	}
 	return e.Redeem()
 }
 
-func (e *EthTransaction) Listen(o Observable) error {
-	key := strings.Join(e.Method, ":")
-	if e.Last == 0 {
-		if b := util.GetCache(key); b != nil {
-			e.Last = util.StringToInt64(string(b))
-		} else {
-			e.Last = 8028174
-		}
+
+func (e *EthTransaction) pullEvents(o Observable) {
+    old_start := e.Last
+    if eventLog, _ := parallel.EtherscanLog(e.Last+1, 0, e.Address, e.Method...); eventLog != nil {
+	for _, result := range eventLog.Result {
+	    e.Last = util.U256(result.BlockNumber).Int64()
+	    e.Result = &result
+	    _ = o.notify(e)
 	}
-	go func() {
-		for {
-			if eventLog, _ := parallel.EtherscanLog(e.Last+1, e.Address, e.Method...); eventLog != nil {
-				for _, result := range eventLog.Result {
-					e.Last = util.U256(result.BlockNumber).Int64()
-					e.Result = &result
-					_ = o.notify(e)
-				}
-			}
-			_ = util.SetCache(key, e.Last, 86400*7)
-			time.Sleep(10 * time.Second)
+    }
+    if old_start != e.Last {
+	key := strings.Join(e.Method, ":")
+	log.Info("set ethcan new last", "key", key, "last", e.Last)
+	_ = util.SetCache(key, e.Last, 86400*7)
+    }
+}
+
+func (e *EthTransaction) Pause() {
+    e.ch <- true
+}
+
+func (e *EthTransaction) Resume() {
+    e.ch <- false
+}
+
+func (e *EthTransaction) ErrorBreak(err error) {
+    e.ch <- err
+}
+
+func (e *EthTransaction) Listen(o Observable) error {
+    e.ch = make(chan interface{})
+    key := strings.Join(e.Method, ":")
+    if e.Last == 0 {
+	if b := util.GetCache(key); b != nil {
+	    e.Last = util.StringToInt64(string(b))
+	} else {
+	    e.Last = 8028174
+	}
+    }
+    updateInterval := time.Second * time.Duration(10)
+    updateTimer := time.NewTimer(updateInterval)
+    pause := false
+    go func() {
+	for {
+	    select {
+	    case v := <-e.ch:
+		switch v:= v.(type) {
+		case error:
+		    log.Info("observer has error", "err", v)
+		    break;
+		case bool:
+		    if v {
+			pause = true
+			log.Info("ethscan event paused", "key", key, "last", e.Last)
+		    } else {
+			pause = false
+			log.Info("ethscan event resumed", "key", key, "last", e.Last)
+		    }
 		}
-	}()
-	return nil
+	    case <-updateTimer.C:
+		if !pause {
+		    e.pullEvents(o)
+		}
+		updateTimer.Reset(updateInterval)
+	    }
+	}
+    }()
+    return nil
 }
 
 // https://github.com/darwinia-network/dj

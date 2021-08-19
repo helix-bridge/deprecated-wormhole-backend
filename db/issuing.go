@@ -57,7 +57,7 @@ func CreateTokenRegisterRecord(extrinsicIndex string, detail *parallel.Extrinsic
 	}
 	for _, event := range detail.Event {
 		switch event.EventId {
-		case "TokenRegistered":
+		case "TokenRegisterFinished":
 			record.Backing = util.AddHex(util.ToString(event.Params[1].Value))
 			record.Source  = util.AddHex(util.ToString(event.Params[2].Value))
 			record.Target  = util.AddHex(util.ToString(event.Params[3].Value))

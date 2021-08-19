@@ -71,14 +71,18 @@ func (e *eth) Call(v interface{}, contract, method string, params ...string) err
 }
 
 // only support two topic query
-func (e *eth) Event(v interface{}, start int64, address string, topic ...string) error {
+func (e *eth) Event(v interface{}, start int64, to int64, address string, topic ...string) error {
 	if len(topic) < 1 {
 		return fmt.Errorf("need at least one topic")
 	}
 	etherscan := e.scan()
+	toBlock := "latest"
+	if to > start {
+	    toBlock = util.Int64ToString(to)
+	}
 	q := url.Values{}
 	q.Add("fromBlock", util.Int64ToString(start))
-	q.Add("toBlock", "latest")
+	q.Add("toBlock", toBlock)
 	q.Add("address", address)
 	q.Add("topic0", topic[0])
 	// if len(topic) == 2 {
@@ -86,7 +90,7 @@ func (e *eth) Event(v interface{}, start int64, address string, topic ...string)
 	// 	q.Add("topic1", topic[1])
 	// }
 	q.Add("apikey", util.GetEnv("ETHSCAN_KEY", "G78R6SGMHGXSMXZCBDW8WE716YQFQGJ68F"))
-	fmt.Println(fmt.Sprintf("%s%s", etherscan, q.Encode()))
+	//fmt.Println(fmt.Sprintf("%s%s", etherscan, q.Encode()))
 	response, err := util.HttpGet(fmt.Sprintf("%s%s", etherscan, q.Encode()))
 	if err != nil {
 		return err

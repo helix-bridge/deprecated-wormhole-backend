@@ -7,6 +7,7 @@ import (
 	"github.com/darwinia-network/link/observer"
 	serverHttp "github.com/darwinia-network/link/server/routes/http"
 	"github.com/darwinia-network/link/util"
+	"github.com/darwinia-network/link/util/log"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/urfave/cli.v2"
 	"net/http"
@@ -15,11 +16,12 @@ import (
 )
 
 func main() {
-	defer util.CloseDB()
-	if err := setupApp().Run(os.Args); err != nil {
-		_, _ = fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
+    log.InitLog(false)
+    defer util.CloseDB()
+    if err := setupApp().Run(os.Args); err != nil {
+	_, _ = fmt.Fprintln(os.Stderr, err)
+	os.Exit(1)
+    }
 }
 
 func setupApp() *cli.App {

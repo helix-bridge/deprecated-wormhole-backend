@@ -3,7 +3,7 @@ package web3
 type Web3 interface {
 	Call(v interface{}, contract, method string, params ...string) error
 	url() string
-	Event(v interface{}, start int64, address string, topic ...string) error
+	Event(v interface{}, start int64, to int64, address string, topic ...string) error
 	GetTransactionByBlockHashAndIndex(blockHash string, index int) string
 }
 
@@ -35,6 +35,6 @@ func (w3 *web3) url() string {
 	return ""
 }
 
-func (w3 *web3) Event(v interface{}, start int64, address string, topic ...string) error {
+func (w3 *web3) Event(v interface{}, start, to int64, address string, topic ...string) error {
 	return nil
 }

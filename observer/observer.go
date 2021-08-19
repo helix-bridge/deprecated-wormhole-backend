@@ -2,7 +2,9 @@ package observer
 
 import (
 	"github.com/darwinia-network/link/config"
+	"github.com/darwinia-network/link/util"
 	"runtime"
+	"time"
 )
 
 type Observable interface {
@@ -14,6 +16,10 @@ type Observable interface {
 type IObserver interface {
 	Do(o Observable) error
 	Listen(o Observable) error
+	Pause()
+	Resume()
+	ErrorBreak(error)
+	LoadData(o Observable, isRely bool)
 }
 
 type ObservableConcrete struct {
@@ -45,6 +51,43 @@ func (o *ObservableConcrete) Run() (err error) {
 	return nil
 }
 
+func (o *ObservableConcrete) Pause() {
+    for _, item := range o.observerList {
+	item.Pause()
+    }
+}
+
+func (o *ObservableConcrete) Resume() {
+    for _, item := range o.observerList {
+	item.Resume()
+    }
+}
+
+func (o *ObservableConcrete) Monitor() {
+    monitorInterval := time.Second * time.Duration(10)
+    monitorTimer := time.NewTimer(monitorInterval)
+    go func() {
+	for {
+	    select {
+	    case <-monitorTimer.C:
+		restart := util.HgetCache("restart", "restart")
+		if string(restart) == "true" {
+		    o.Pause()
+		    for _, item := range o.observerList {
+			item.LoadData(o, false)
+		    }
+		    for _, item := range o.observerList {
+			item.LoadData(o, true)
+		    }
+		    util.HsetCache("restart", "restart", []byte("false"))
+		    o.Resume()
+		}
+		monitorTimer.Reset(monitorInterval)
+	    }
+	}
+    }()
+}
+
 func Run() {
 	subject := &ObservableConcrete{}
 
@@ -60,6 +103,7 @@ func Run() {
 		&SubscanEvent{ModuleId: "ethereumrelayauthorities", EventId: "MMRRootSigned"},
 		&SubscanEvent{ModuleId: "ethereumissuing"},
 	)
+	subject.Monitor()
 	_ = subject.Run()
 }
 
