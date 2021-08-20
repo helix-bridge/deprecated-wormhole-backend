@@ -95,8 +95,8 @@ func (s *SubscanEvent) pullEvents(o Observable) {
     if eventLog := parallel.SubscanEvents(s.ModuleId, s.EventId, s.Last); eventLog != nil {
 	for _, result := range eventLog {
 	    s.Result = &result
-	    if result.BlockNum > s.Last {
-		s.Last = result.BlockNum
+	    if result.BlockNum >= s.Last {
+		s.Last = result.BlockNum + 1
 	    }
 	    log.Info("subscan find valid event", "key", key, "event", s.Result)
 	    _ = o.notify(s)
@@ -129,7 +129,7 @@ func (s *SubscanEvent) Listen(o Observable) error {
 		}
 	}
 	log.Info("subscan start listen", "key", key, "last", s.Last)
-	updateInterval := time.Second * time.Duration(10)
+	updateInterval := time.Second * time.Duration(15)
 	updateTimer := time.NewTimer(updateInterval)
 	pause := false
 	go func() {

@@ -105,7 +105,7 @@ func (e *EthTransaction) Listen(o Observable) error {
 	    e.Last = 8028174
 	}
     }
-    updateInterval := time.Second * time.Duration(10)
+    updateInterval := time.Second * time.Duration(15)
     updateTimer := time.NewTimer(updateInterval)
     pause := false
     go func() {
