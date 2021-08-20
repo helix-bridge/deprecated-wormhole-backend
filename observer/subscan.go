@@ -84,7 +84,6 @@ func (s *SubscanEvent) LoadData(o Observable, isRely bool) {
 	    break
 	}
 	time.Sleep(1000 * time.Millisecond)
-	log.Info("xxx", "from", subfrom, "to", subto)
     }
     log.Info("finish to load data", "key", key, "isrely", isRely, "subfrom", subfrom, "subto", subto, "count", count)
     s.Last = subto
@@ -92,18 +91,18 @@ func (s *SubscanEvent) LoadData(o Observable, isRely bool) {
 
 func (s *SubscanEvent) pullEvents(o Observable) {
     old_start := s.Last
+    key := s.ModuleId + ":" + s.EventId
     if eventLog := parallel.SubscanEvents(s.ModuleId, s.EventId, s.Last); eventLog != nil {
 	for _, result := range eventLog {
 	    s.Result = &result
 	    if result.BlockNum > s.Last {
 		s.Last = result.BlockNum
 	    }
+	    log.Info("subscan find valid event", "key", key, "event", s.Result)
 	    _ = o.notify(s)
 	}
     }
-    //fmt.Println("scan subscan from last", key, s.Last)
     if old_start != s.Last {
-	key := s.ModuleId + ":" + s.EventId
 	log.Info("set subscan new last", "key", key, "last", s.Last)
 	_ = util.SetCache(key, s.Last, 86400*7)
     }

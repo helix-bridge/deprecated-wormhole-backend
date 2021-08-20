@@ -68,15 +68,16 @@ func (e *EthTransaction) Do(o Observable) error {
 
 func (e *EthTransaction) pullEvents(o Observable) {
     old_start := e.Last
+    key := strings.Join(e.Method, ":")
     if eventLog, _ := parallel.EtherscanLog(e.Last+1, 0, e.Address, e.Method...); eventLog != nil {
 	for _, result := range eventLog.Result {
 	    e.Last = util.U256(result.BlockNumber).Int64()
 	    e.Result = &result
+	    log.Info("eth find valid event", "key", key, "event", e.Result)
 	    _ = o.notify(e)
 	}
     }
     if old_start != e.Last {
-	key := strings.Join(e.Method, ":")
 	log.Info("set ethcan new last", "key", key, "last", e.Last)
 	_ = util.SetCache(key, e.Last, 86400*7)
     }
