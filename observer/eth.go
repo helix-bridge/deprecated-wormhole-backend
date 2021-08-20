@@ -105,6 +105,7 @@ func (e *EthTransaction) Listen(o Observable) error {
 	    e.Last = 8028174
 	}
     }
+    log.Info("ethscan start listen", "key", key, "last", e.Last)
     updateInterval := time.Second * time.Duration(15)
     updateTimer := time.NewTimer(updateInterval)
     pause := false
