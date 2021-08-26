@@ -31,9 +31,9 @@ func AddEthereumLockRecord(chain, tx, source, target, sender, receiver string, a
 	return query.Error
 }
 
-func EthereumLockList(sender string, page, row int, confirmMode string) (list []EthereumLockRecord, count int) {
+func EthereumLockList(sender string, page, row int, confirmed string) (list []EthereumLockRecord, count int) {
 
-	switch confirmMode {
+	switch confirmed {
 	case "true":
 	    util.DB.Model(EthereumLockRecord{}).Where("darwinia_tx <> ''").Where("sender = ?", sender).Count(&count)
 	    util.DB.Where("darwinia_tx <> ''").Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)

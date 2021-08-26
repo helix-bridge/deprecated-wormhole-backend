@@ -69,11 +69,11 @@ type MerkleMountainRangeRootLog struct {
 	ParentMmrRoot string `json:"parent_mmr_root"`
 }
 
-func DarwiniaBackingLocks(accountId string, page, row int, confirmMode string) ([]DarwiniaBackingLock, int) {
+func DarwiniaBackingLocks(accountId string, page, row int, confirmed string) ([]DarwiniaBackingLock, int) {
 	var list []DarwiniaBackingLock
 	var count int
 
-	switch confirmMode {
+	switch confirmed {
 	case "true":
 	    util.DB.Model(DarwiniaBackingLock{}).Where("tx <> ''").Where("account_id = ?", accountId).Count(&count)
 	    util.DB.Where("tx <> ''").Where("account_id = ?", accountId).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
