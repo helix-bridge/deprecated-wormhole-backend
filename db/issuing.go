@@ -166,11 +166,20 @@ func (r *TokenBurnRecord) setMMRRoot(mmrRoot string) error {
 	return query.Error
 }
 
-func TokenBurnRecords(sender string, page, row int) ([]TokenBurnRecord, int) {
+func TokenBurnRecords(sender string, page, row int, confirmed string) ([]TokenBurnRecord, int) {
 	var list []TokenBurnRecord
 	var count int
-	util.DB.Model(TokenBurnRecord{}).Where("sender = ?", sender).Count(&count)
-	util.DB.Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	switch confirmed {
+	case "true":
+	    util.DB.Model(TokenBurnRecord{}).Where("tx <> ''").Where("sender = ?", sender).Count(&count)
+	    util.DB.Where("tx <> ''").Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	case "false":
+	    util.DB.Model(TokenBurnRecord{}).Where("tx = ''").Where("sender = ?", sender).Count(&count)
+	    util.DB.Where("tx = ''").Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	default:
+	    util.DB.Model(TokenBurnRecord{}).Where("sender = ?", sender).Count(&count)
+	    util.DB.Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	}
 
 	for index, burned := range list {
 		if burned.MMRRoot != "" {

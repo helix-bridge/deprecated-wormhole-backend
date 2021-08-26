@@ -31,12 +31,21 @@ func AddRedeemRecord(chain, tx, address, target, currency string, amount decimal
 	return query.Error
 }
 
-func RedeemList(address string, page, row int) ([]RedeemRecord, int) {
+func RedeemList(address string, page, row int, confirmed string) ([]RedeemRecord, int) {
 	db := util.DB
 	var list []RedeemRecord
 	var count int
-	db.Model(RedeemRecord{}).Where("address = ?", address).Count(&count)
-	db.Where("address = ?", address).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	switch confirmed {
+	case "true":
+	    db.Model(RedeemRecord{}).Where("darwinia_tx <> ''").Where("address = ?", address).Count(&count)
+	    db.Where("darwinia_tx <> ''").Where("address = ?", address).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	case "false":
+	    db.Model(RedeemRecord{}).Where("darwinia_tx = ''").Where("address = ?", address).Count(&count)
+	    db.Where("darwinia_tx = ''").Where("address = ?", address).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	default:
+	    db.Model(RedeemRecord{}).Where("address = ?", address).Count(&count)
+	    db.Where("address = ?", address).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	}
 	for index, value := range list {
 		list[index].IsRelayed = GetRelayBestBlockNum() >= uint64(value.BlockNum)
 	}

@@ -69,11 +69,21 @@ type MerkleMountainRangeRootLog struct {
 	ParentMmrRoot string `json:"parent_mmr_root"`
 }
 
-func DarwiniaBackingLocks(accountId string, page, row int) ([]DarwiniaBackingLock, int) {
+func DarwiniaBackingLocks(accountId string, page, row int, confirmMode string) ([]DarwiniaBackingLock, int) {
 	var list []DarwiniaBackingLock
 	var count int
-	util.DB.Model(DarwiniaBackingLock{}).Where("account_id = ?", accountId).Count(&count)
-	util.DB.Where("account_id = ?", accountId).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+
+	switch confirmMode {
+	case "true":
+	    util.DB.Model(DarwiniaBackingLock{}).Where("tx <> ''").Where("account_id = ?", accountId).Count(&count)
+	    util.DB.Where("tx <> ''").Where("account_id = ?", accountId).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	case "false":
+	    util.DB.Model(DarwiniaBackingLock{}).Where("tx = ''").Where("account_id = ?", accountId).Count(&count)
+	    util.DB.Where("tx = ''").Where("account_id = ?", accountId).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	default:
+	    util.DB.Model(DarwiniaBackingLock{}).Where("account_id = ?", accountId).Count(&count)
+	    util.DB.Where("account_id = ?", accountId).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	}
 
 	for index, lock := range list {
 		if lock.MMRRoot != "" {

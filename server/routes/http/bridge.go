@@ -14,6 +14,7 @@ func redeem() gin.HandlerFunc {
 			Address string `json:"address" binding:"required" form:"address"`
 			Page    int    `json:"page" form:"page"`
 			Row     int    `json:"row" binding:"required" form:"row"`
+			Confirmed string `json:"confirmed" form:"confirmed"`
 		})
 		if err := c.ShouldBindQuery(p); err != nil {
 			c.JSON(http.StatusOK, JsonFormat(nil, 1001))
@@ -23,7 +24,7 @@ func redeem() gin.HandlerFunc {
 			c.JSON(http.StatusOK, JsonFormat(nil, 1001))
 			return
 		}
-		list, count := db.RedeemList(p.Address, p.Page, p.Row)
+		list, count := db.RedeemList(p.Address, p.Page, p.Row, p.Confirmed)
 		c.JSON(http.StatusOK, JsonFormat(map[string]interface{}{
 		    "list": list, "count": count,
 		}, 0))
@@ -42,6 +43,7 @@ func locks() gin.HandlerFunc {
 			Address string `json:"address" binding:"required" form:"address"`
 			Page    int    `json:"page" form:"page"`
 			Row     int    `json:"row" binding:"required" form:"row"`
+			Confirmed string `json:"confirmed" form:"confirmed"`
 		})
 		if err := c.ShouldBindQuery(p); err != nil {
 			c.JSON(http.StatusOK, JsonFormat(nil, 1001))
@@ -51,7 +53,7 @@ func locks() gin.HandlerFunc {
 			c.JSON(http.StatusOK, JsonFormat(nil, 1001))
 			return
 		}
-		list, count := db.DarwiniaBackingLocks(p.Address, p.Page, p.Row)
+		list, count := db.DarwiniaBackingLocks(p.Address, p.Page, p.Row, p.Confirmed)
 		best, MMRRoot := db.GetMMRIndexBestBlockNum()
 		c.JSON(http.StatusOK, JsonFormat(map[string]interface{}{
 			"list": list, "count": count, "implName": config.Link.ImplName, "best": best, "MMRRoot": MMRRoot,
@@ -91,12 +93,13 @@ func erc20TokenBurns() gin.HandlerFunc {
 			Sender string `json:"sender" binding:"required" form:"sender"`
 			Page   int    `json:"page" form:"page"`
 			Row    int    `json:"row" binding:"required" form:"row"`
+			Confirmed string `json:"confirmed" form:"confirmed"`
 		})
 		if err := c.ShouldBindQuery(p); err != nil {
 			c.JSON(http.StatusOK, JsonFormat(nil, 1001))
 			return
 		}
-		list, count := db.TokenBurnRecords(p.Sender, p.Page, p.Row)
+		list, count := db.TokenBurnRecords(p.Sender, p.Page, p.Row, p.Confirmed)
 		best, MMRRoot := db.GetMMRIndexBestBlockNum()
 		c.JSON(http.StatusOK, JsonFormat(map[string]interface{}{
 			"list": list, "count": count, "implName": config.Link.ImplName, "best": best, "MMRRoot": MMRRoot,
@@ -110,12 +113,13 @@ func tokenLock() gin.HandlerFunc {
 			Sender string `json:"sender" binding:"required" form:"sender"`
 			Page   int    `json:"page" form:"page"`
 			Row    int    `json:"row" binding:"required" form:"row"`
+			Confirmed string `json:"confirmed" form:"confirmed"`
 		})
 		if err := c.ShouldBindQuery(p); err != nil {
 			c.JSON(http.StatusOK, JsonFormat(nil, 1001))
 			return
 		}
-		list, count := db.EthereumLockList(p.Sender, p.Page, p.Row)
+		list, count := db.EthereumLockList(p.Sender, p.Page, p.Row, p.Confirmed)
 		c.JSON(http.StatusOK, JsonFormat(map[string]interface{}{
 			"list": list, "count": count, "implName": config.Link.ImplName}, 0))
 	}
