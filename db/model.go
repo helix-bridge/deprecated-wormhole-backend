@@ -25,7 +25,11 @@ func init() {
 		db.Model(PloSubscriber{}).AddUniqueIndex("email", "email")
 		db.Model(DarwiniaBackingLock{}).AddIndex("target", "target")
 		db.Model(TokenRegisterRecord{}).AddIndex("source", "source")
+		db.Model(TokenRegisterRecord{}).AddIndex("tx", "tx")
 		db.Model(TokenBurnRecord{}).AddIndex("sender", "sender")
+		db.Model(TokenBurnRecord{}).AddIndex("tx", "tx")
 		db.Model(EthereumLockRecord{}).AddIndex("sender", "sender")
+		db.Model(DarwiniaBackingLock{}).AddIndex("tx", "tx")
+		db.Model(DarwiniaBackingLock{}).AddIndex("account_id", "account_id")
 	}
 }
