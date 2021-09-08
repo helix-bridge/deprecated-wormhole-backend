@@ -16,7 +16,6 @@ import (
 )
 
 func main() {
-    log.InitLog(false)
     defer util.CloseDB()
     if err := setupApp().Run(os.Args); err != nil {
 	_, _ = fmt.Fprintln(os.Stderr, err)
@@ -40,7 +39,16 @@ func setupApp() *cli.App {
 		Commands: []*cli.Command{
 			{
 				Name: "observer",
+				Flags: []cli.Flag {
+					&cli.BoolFlag {
+						Name: "verbose",
+						Aliases: []string{"v"},
+						Usage: "Verbose mode",
+					},
+				},
 				Action: func(c *cli.Context) error {
+					v := c.Bool("verbose")
+					log.InitLog(v)
 					observer.Run()
 					util.RunForever()
 					return nil
