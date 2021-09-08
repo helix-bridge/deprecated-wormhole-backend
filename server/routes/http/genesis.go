@@ -12,7 +12,7 @@ func ringBurn() gin.HandlerFunc {
 		p := new(struct {
 			Address string `json:"address" binding:"required" form:"address"`
 			Page    int    `json:"page" form:"page"`
-			Row     int    `json:"row" binding:"required" form:"row"`
+			Row     int    `json:"row" form:"row"`
 		})
 		if err := c.ShouldBindQuery(p); err != nil {
 			c.JSON(http.StatusOK, JsonFormat(nil, 1001))

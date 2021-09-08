@@ -33,6 +33,10 @@ func RingBurnList(address string, page, row int) ([]RingBurnRecord, int) {
 	var list []RingBurnRecord
 	var count int
 	db.Model(RingBurnRecord{}).Where("address = ?", address).Count(&count)
-	db.Where("address = ?", address).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	if row > 0 {
+		db.Where("address = ?", address).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	} else {
+		db.Model(list).Where("address = ?", address).Order("block_num desc").Find(&list)
+	}
 	return list, count
 }
