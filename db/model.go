@@ -26,10 +26,13 @@ func init() {
 		db.Model(DarwiniaBackingLock{}).AddIndex("target", "target")
 		db.Model(TokenRegisterRecord{}).AddIndex("source", "source")
 		db.Model(TokenRegisterRecord{}).AddIndex("tx", "tx")
+		db.Model(TokenRegisterRecord{}).AddIndex("mmr_index", "mmr_index")
 		db.Model(TokenBurnRecord{}).AddIndex("sender", "sender")
 		db.Model(TokenBurnRecord{}).AddIndex("tx", "tx")
+		db.Model(TokenBurnRecord{}).AddIndex("mmr_index", "mmr_index")
 		db.Model(EthereumLockRecord{}).AddIndex("sender", "sender")
 		db.Model(DarwiniaBackingLock{}).AddIndex("tx", "tx")
 		db.Model(DarwiniaBackingLock{}).AddIndex("account_id", "account_id")
+		db.Model(DarwiniaBackingLock{}).AddIndex("mmr_index", "mmr_index")
 	}
 }
