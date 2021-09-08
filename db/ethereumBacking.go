@@ -45,8 +45,9 @@ func EthereumLockList(sender string, page, row int, confirmed string) (list []Et
 	    util.DB.Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
 	}
 
+	relay_best_blocknum := GetRelayBestBlockNum()
 	for index, value := range list {
-		list[index].IsRelayed = GetRelayBestBlockNum() >= uint64(value.BlockNum)
+		list[index].IsRelayed = relay_best_blocknum >= uint64(value.BlockNum)
 	}
 	return list, count
 }

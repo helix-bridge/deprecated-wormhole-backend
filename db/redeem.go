@@ -46,8 +46,9 @@ func RedeemList(address string, page, row int, confirmed string) ([]RedeemRecord
 	    db.Model(RedeemRecord{}).Where("address = ?", address).Count(&count)
 	    db.Where("address = ?", address).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
 	}
+	relay_best_blocknum := GetRelayBestBlockNum()
 	for index, value := range list {
-		list[index].IsRelayed = GetRelayBestBlockNum() >= uint64(value.BlockNum)
+		list[index].IsRelayed = relay_best_blocknum >= uint64(value.BlockNum)
 	}
 	return list, count
 }
