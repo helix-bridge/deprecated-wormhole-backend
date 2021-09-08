@@ -29,8 +29,9 @@ func (e *EthTransaction) LoadData(o Observable, isRely bool) {
 	return isRely == e.RelyOn()
     }
 
-    ethfrom := util.StringToInt64(string(util.HgetCache("restart", "ethfrom")))
-    ethto := util.StringToInt64(string(util.HgetCache("restart", "ethto")))
+    restartInfo := util.HgetCacheAll("restart")
+    ethfrom := util.StringToInt64(restartInfo["ethfrom"])
+    ethto := util.StringToInt64(restartInfo["ethto"])
 
     key := strings.Join(e.Method, ":")
     log.Info("eth start to load init data", "key", key, "isrely", isRely, "ethfrom", ethfrom, "ethto", ethto)

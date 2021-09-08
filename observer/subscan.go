@@ -52,8 +52,9 @@ func (s *SubscanEvent) LoadData(o Observable, isRely bool) {
 	return isRely == s.RelyOn()
     }
 
-    subfrom := util.StringToInt64(string(util.HgetCache("restart", "subfrom")))
-    subto := util.StringToInt64(string(util.HgetCache("restart", "subto")))
+    restartInfo := util.HgetCacheAll("restart")
+    subfrom := util.StringToInt64(restartInfo["subfrom"])
+    subto := util.StringToInt64(restartInfo["subto"])
 
     key := s.ModuleId + ":" + s.EventId
     log.Info("subscan start to load init data", "key", key, "isrely", isRely, "subfrom", subfrom, "subto", subto)
