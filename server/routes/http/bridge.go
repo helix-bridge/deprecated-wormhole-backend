@@ -83,6 +83,10 @@ func erc20RegisterResponse() gin.HandlerFunc {
 			c.JSON(http.StatusOK, JsonFormat(nil, 1001))
 			return
 		}
+		if !util.VerifyEthAddress(p.Source) {
+			c.JSON(http.StatusOK, JsonFormat(nil, 1002))
+			return
+		}
 		c.JSON(http.StatusOK, JsonFormat(db.TokenRegisterRecordInfo(p.Source), 0))
 	}
 }
@@ -97,6 +101,10 @@ func erc20TokenBurns() gin.HandlerFunc {
 		})
 		if err := c.ShouldBindQuery(p); err != nil {
 			c.JSON(http.StatusOK, JsonFormat(nil, 1001))
+			return
+		}
+		if !util.VerifyEthAddress(p.Sender) {
+			c.JSON(http.StatusOK, JsonFormat(nil, 1002))
 			return
 		}
 		list, count := db.TokenBurnRecords(p.Sender, p.Page, p.Row, p.Confirmed)
@@ -117,6 +125,10 @@ func tokenLock() gin.HandlerFunc {
 		})
 		if err := c.ShouldBindQuery(p); err != nil {
 			c.JSON(http.StatusOK, JsonFormat(nil, 1001))
+			return
+		}
+		if !util.VerifyEthAddress(p.Sender) {
+			c.JSON(http.StatusOK, JsonFormat(nil, 1002))
 			return
 		}
 		list, count := db.EthereumLockList(p.Sender, p.Page, p.Row, p.Confirmed)
