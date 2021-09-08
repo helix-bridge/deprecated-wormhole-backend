@@ -58,6 +58,9 @@ func CreateTokenRegisterRecord(extrinsicIndex string, detail *parallel.Extrinsic
 	for _, event := range detail.Event {
 		switch event.EventId {
 		case "TokenRegisterFinished":
+			if len(event.Params) < 4 {
+				return errors.New("invalid register event params length")
+			}
 			record.Backing = util.AddHex(util.ToString(event.Params[1].Value))
 			record.Source  = util.AddHex(util.ToString(event.Params[2].Value))
 			record.Target  = util.AddHex(util.ToString(event.Params[3].Value))
@@ -94,7 +97,7 @@ func CreateTokenBurnRecord(extrinsicIndex string, detail *parallel.ExtrinsicDeta
 		switch event.EventId {
 		case "BurnToken":
 			if len(event.Params) < 7 {
-				return errors.New("invalid event params length")
+				return errors.New("invalid token burn event params length")
             }
 			record.Backing = util.AddHex(util.ToString(event.Params[1].Value))
 			record.Sender = util.AddHex(util.ToString(event.Params[2].Value))
