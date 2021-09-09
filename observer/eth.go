@@ -168,9 +168,9 @@ func (e *EthTransaction) Redeem() error {
 
 	case VerifyProof:
 		blockNum := util.U256(logSlice[0]).Uint64()
-		if e.Address == config.Link.EthereumBacking {
+		if strings.EqualFold(e.Address, config.Link.EthereumBacking) {
 			db.SetTokenRegistrationConfirm(blockNum, util.AddHex(e.Result.TransactionHash))
-		} else if e.Address == config.Link.TokenIssuing {
+		} else if strings.EqualFold(e.Address, config.Link.TokenIssuing) {
 			db.SetBackingLockConfirm(blockNum, util.AddHex(e.Result.TransactionHash))
 		}
 		return nil
