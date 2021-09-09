@@ -109,14 +109,10 @@ func HgetCache(key, field string) []byte {
 func HgetCacheAll(key string) map[string]string {
     conn := SubPool.Get()
     defer conn.Close()
-    if cache, err := redis.Strings(conn.Do("hgetall", cacheKey(key))); err != nil {
+    if cache, err := redis.StringMap(conn.Do("hgetall", cacheKey(key))); err != nil {
         return nil
     } else {
-        ret := make(map[string]string)
-        for index := 0; index < len(cache); index += 2 {
-            ret[cache[index]] = cache[index+1]
-        }
-        return ret
+        return cache
     }
 }
 
