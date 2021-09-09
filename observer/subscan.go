@@ -122,43 +122,42 @@ func (s *SubscanEvent) ErrorBreak(err error) {
 }
 
 func (s *SubscanEvent) Listen(o Observable) error {
-        s.ch = make(chan interface{})
-	key := s.ModuleId + ":" + s.EventId
-	if s.Last == 0 {
-		if b := util.GetCache(key); b != nil {
-			s.Last = util.StringToInt64(string(b))
-		}
-	}
-	log.Info("subscan start listen", "key", key, "last", s.Last)
-	updateInterval := time.Second * time.Duration(15)
-	updateTimer := time.NewTimer(updateInterval)
-	pause := false
-	go func() {
-	    for {
-		select {
-		case v := <-s.ch:
-		    switch v:= v.(type) {
-		    case error:
-			log.Info("observer has error", "err", v)
-			break;
-		    case bool:
-			if v {
-			    pause = true
-			    log.Info("subscan event paused", "key", key, "last", s.Last)
-			} else {
-			    pause = false
-			    log.Info("subscan event resumed", "key", key, "last", s.Last)
-			}
-		    }
-		case <-updateTimer.C:
-		    if !pause {
-			s.pullEvents(o)
-		    }
-		    updateTimer.Reset(updateInterval)
-		}
-	    }
-	}()
-	return nil
+    s.ch = make(chan interface{})
+    key := s.ModuleId + ":" + s.EventId
+    if s.Last == 0 {
+        if b := util.GetCache(key); b != nil {
+            s.Last = util.StringToInt64(string(b))
+        }
+    }
+    log.Info("subscan start listen", "key", key, "last", s.Last)
+    updateInterval := time.Second * time.Duration(15)
+    updateTimer := time.NewTicker(updateInterval)
+    pause := false
+    go func() {
+        for {
+            select {
+            case v := <-s.ch:
+                switch v:= v.(type) {
+                case error:
+                    log.Info("observer has error", "err", v)
+                    break;
+                case bool:
+                    if v {
+                        pause = true
+                        log.Info("subscan event paused", "key", key, "last", s.Last)
+                    } else {
+                        pause = false
+                        log.Info("subscan event resumed", "key", key, "last", s.Last)
+                    }
+                }
+            case <-updateTimer.C:
+                if !pause {
+                    s.pullEvents(o)
+                }
+            }
+        }
+    }()
+    return nil
 }
 
 type EthereumTransactionIndex struct {

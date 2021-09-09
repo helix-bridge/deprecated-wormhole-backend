@@ -100,40 +100,39 @@ func (e *EthTransaction) Listen(o Observable) error {
     e.ch = make(chan interface{})
     key := strings.Join(e.Method, ":")
     if e.Last == 0 {
-	if b := util.GetCache(key); b != nil {
-	    e.Last = util.StringToInt64(string(b))
-	} else {
-	    e.Last = 8028174
-	}
+        if b := util.GetCache(key); b != nil {
+            e.Last = util.StringToInt64(string(b))
+        } else {
+            e.Last = 8028174
+        }
     }
     log.Info("ethscan start listen", "key", key, "last", e.Last)
     updateInterval := time.Second * time.Duration(15)
-    updateTimer := time.NewTimer(updateInterval)
+    updateTimer := time.NewTicker(updateInterval)
     pause := false
     go func() {
-	for {
-	    select {
-	    case v := <-e.ch:
-		switch v:= v.(type) {
-		case error:
-		    log.Info("observer has error", "err", v)
-		    break;
-		case bool:
-		    if v {
-			pause = true
-			log.Info("ethscan event paused", "key", key, "last", e.Last)
-		    } else {
-			pause = false
-			log.Info("ethscan event resumed", "key", key, "last", e.Last)
-		    }
-		}
-	    case <-updateTimer.C:
-		if !pause {
-		    e.pullEvents(o)
-		}
-		updateTimer.Reset(updateInterval)
-	    }
-	}
+        for {
+            select {
+            case v := <-e.ch:
+                switch v:= v.(type) {
+                case error:
+                    log.Info("observer has error", "err", v)
+                    break;
+                case bool:
+                    if v {
+                        pause = true
+                        log.Info("ethscan event paused", "key", key, "last", e.Last)
+                    } else {
+                        pause = false
+                        log.Info("ethscan event resumed", "key", key, "last", e.Last)
+                    }
+                }
+            case <-updateTimer.C:
+                if !pause {
+                    e.pullEvents(o)
+                }
+            }
+        }
     }()
     return nil
 }
