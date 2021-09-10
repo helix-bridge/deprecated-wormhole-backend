@@ -28,8 +28,15 @@ func AddRingBurnRecord(chain, tx, address, target, currency string, amount decim
 	return query.Error
 }
 
-func RingBurnList(address string) (list []RingBurnRecord) {
+func RingBurnList(address string, page, row int) ([]RingBurnRecord, int) {
 	db := util.DB
-	db.Model(list).Where("address = ?", address).Order("block_num desc").Find(&list)
-	return
+	var list []RingBurnRecord
+	var count int
+	db.Model(RingBurnRecord{}).Where("address = ?", address).Count(&count)
+	if row > 0 {
+		db.Where("address = ?", address).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	} else {
+		db.Model(list).Where("address = ?", address).Order("block_num desc").Find(&list)
+	}
+	return list, count
 }

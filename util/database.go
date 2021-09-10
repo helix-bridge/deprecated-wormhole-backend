@@ -23,7 +23,7 @@ func init() {
 	dbPass := GetEnv("MYSQL_PASS", "")
 	dbName := GetEnv("MYSQL_DB", "darwinia-dapp")
 	DB = initMysql(dbPath, dbUser, dbPass, dbName)
-	DB.LogMode(true)
+	DB.LogMode(false)
 }
 
 func initMysql(host, user, pass, db string) *gorm.DB {

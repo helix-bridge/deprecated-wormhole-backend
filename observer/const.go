@@ -25,6 +25,7 @@ var (
 	BurnAndRedeemDeposit = util.AddHex(hex.EncodeToString(crypto.SoliditySHA3(crypto.String("BurnAndRedeem(uint256,address,uint48,uint48,uint64,uint128,bytes)"))))
 	VerifyProof          = util.AddHex(hex.EncodeToString(crypto.SoliditySHA3(crypto.String("VerifyProof(uint32)"))))
 	SetRootEvent         = util.AddHex(hex.EncodeToString(crypto.SoliditySHA3(crypto.String("SetRootEvent(address,bytes32,uint256)"))))
+	BackingLock         = util.AddHex(hex.EncodeToString(crypto.SoliditySHA3(crypto.String("BackingLock(address,address,address,uint256,address,uint256)"))))
 
 	EthAvailableEvent = []string{
 		RingBuildInEvent,
@@ -33,5 +34,6 @@ var (
 		BurnAndRedeemDeposit,
 		VerifyProof,
 		SetRootEvent,
+		BackingLock,
 	}
 )

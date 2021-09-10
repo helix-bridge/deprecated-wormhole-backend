@@ -39,7 +39,7 @@ func (e *tron) Call(v interface{}, contract, method string, params ...string) er
 	return json.Unmarshal(response, v)
 }
 
-func (e *tron) Event(v interface{}, start int64, address string, topic ...string) error {
+func (e *tron) Event(v interface{}, start, _to int64, address string, topic ...string) error {
 	trongrid := fmt.Sprintf("%s/v1/contracts/%s/events?", e.scan(), address)
 	q := url.Values{}
 	q.Add("only_confirmed", "true")

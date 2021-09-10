@@ -15,6 +15,7 @@ require (
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.8 // indirect
 	github.com/shopspring/decimal v1.2.0
+	github.com/sirupsen/logrus v1.2.0
 	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.4.0 // indirect
 	github.com/ugorji/go v1.1.7 // indirect

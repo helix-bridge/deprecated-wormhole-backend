@@ -24,6 +24,18 @@ func (e *TronTransaction) Do(o Observable) error {
 	return e.RingBurnRecord()
 }
 
+func (e *TronTransaction) Pause() {
+}
+
+func (e *TronTransaction) Resume() {
+}
+
+func (e *TronTransaction) ErrorBreak(_ error) {
+}
+
+func (e *TronTransaction) LoadData(o Observable, isRely bool) {
+}
+
 func (e *TronTransaction) Listen(o Observable) error {
 	key := runFuncName()
 	if e.Last == 0 {
