@@ -64,23 +64,24 @@ func (s *SubscanEvent) LoadData(o Observable, isRely bool) {
 	    break
 	}
 	if eventLog := parallel.SubscanEvents(s.ModuleId, s.EventId, subfrom); eventLog != nil {
-	    count += len(eventLog)
-	    for _, result := range eventLog {
-		s.Result = &result
-		if result.BlockNum >= subfrom {
-		    subfrom = result.BlockNum + 1
-		}
-		if result.BlockNum > subto {
-		    break
-		}
-		//if result.BlockNum > subfrom {
-		    //subfrom = result.BlockNum
-		//}
-		if !needSync() {
-		    continue
-		}
-		_ = o.notify(s)
-	    }
+        count += len(eventLog)
+        for _, result := range eventLog {
+            s.Result = &result
+            if result.BlockNum >= subfrom {
+                subfrom = result.BlockNum + 1
+            }
+            if result.BlockNum > subto {
+                break
+            }
+            //if result.BlockNum > subfrom {
+            //subfrom = result.BlockNum
+            //}
+            if !needSync() {
+                continue
+            }
+            _ = o.notify(s)
+        }
+        log.Info("scan substrate transactions", "from", subfrom, "to", subto, "key", key);
 	} else {
 	    break
 	}

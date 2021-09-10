@@ -36,24 +36,25 @@ func (e *EthTransaction) LoadData(o Observable, isRely bool) {
     key := strings.Join(e.Method, ":")
     log.Info("eth start to load init data", "key", key, "isrely", isRely, "ethfrom", ethfrom, "ethto", ethto)
     for {
-	if ethfrom >= ethto {
-	    break
-	}
-	if eventLog, _ := parallel.EtherscanLog(ethfrom, ethfrom + 102400, e.Address, e.Method...); eventLog != nil {
-	    for _, result := range eventLog.Result {
-		e.Result = &result
-		ethfrom = util.U256(result.BlockNumber).Int64()
-		if ethfrom > ethto {
-		    break
-		}
-		if !needSync() {
-		    continue
-		}
-		_ = o.notify(e)
-	    }
-	}
-	ethfrom = ethfrom + 102400
-	time.Sleep(1 * time.Second)
+        if ethfrom >= ethto {
+            break
+        }
+        if eventLog, _ := parallel.EtherscanLog(ethfrom, ethfrom + 102400, e.Address, e.Method...); eventLog != nil {
+            for _, result := range eventLog.Result {
+                e.Result = &result
+                ethfrom = util.U256(result.BlockNumber).Int64()
+                if ethfrom > ethto {
+                    break
+                }
+                if !needSync() {
+                    continue
+                }
+                _ = o.notify(e)
+            }
+        }
+        ethfrom = ethfrom + 102400
+        log.Info("scan eth transactions", "from", ethfrom, "to", ethto, "key", key);
+        time.Sleep(1 * time.Second)
     }
     log.Info("finish to load data", "key", key, "isrely", isRely, "ethfrom", ethfrom, "ethto", ethto)
     e.Last = ethto
