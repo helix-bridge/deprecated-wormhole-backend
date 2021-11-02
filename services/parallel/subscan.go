@@ -51,8 +51,12 @@ type BlockHeader struct {
 	Digest         []string `json:"digest"`
 }
 
+type SubscanLogData struct {
+    Logs []SubscanLog `json:"logs"`
+}
+
 type SubscanLogsRes struct {
-	Data []SubscanLog `json:"data"`
+    Data SubscanLogData `json:"data"`
 }
 
 type SubscanEvent struct {
@@ -136,14 +140,14 @@ func SubscanExtrinsic(extrinsicIndex string) *ExtrinsicDetail {
 }
 
 func SubscanLogs(blockNum uint) []SubscanLog {
-	var res SubscanLogsRes
-	url := fmt.Sprintf("%s/api/scan/logs", config.Link.SubscanHost)
-	raw, err := PostWithApiKey(url, strings.NewReader(fmt.Sprintf(`{"block_num":%d}`, blockNum)))
-	if err != nil {
-		return nil
-	}
-	util.UnmarshalAny(&res, raw)
-	return res.Data
+    var res SubscanLogsRes
+    url := fmt.Sprintf("%s/api/scan/logs", config.Link.SubscanHost)
+    raw, err := PostWithApiKey(url, strings.NewReader(fmt.Sprintf(`{"block_num":%d, "row": 100}`, blockNum)))
+    if err != nil {
+        return nil
+    }
+    util.UnmarshalAny(&res, raw)
+    return res.Data.Logs
 }
 
 func SubscanBlockHeader(blockNum uint) *BlockHeader {
