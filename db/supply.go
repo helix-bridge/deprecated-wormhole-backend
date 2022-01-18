@@ -65,25 +65,21 @@ func (c *Currency) supply() *Supply {
 	wg.Add(3)
 	go func() {
 		ethSupply := c.ethSupply()
-		supply.CirculatingSupply = supply.CirculatingSupply.Add(ethSupply.CirculatingSupply)
 		supply.Details = append(supply.Details, ethSupply)
 		wg.Done()
 	}()
 	go func() {
 		tronSupply := c.tronSupply()
-		supply.CirculatingSupply = supply.CirculatingSupply.Add(tronSupply.CirculatingSupply)
 		supply.Details = append(supply.Details, tronSupply)
 		wg.Done()
 	}()
 	go func() {
-		supply.TotalSupply = c.TotalSupply()
+		supply.CirculatingSupply, supply.TotalSupply = c.TotalSupply()
 		wg.Done()
 	}()
 	wg.Wait()
 	if supply.MaxSupply.IsZero() {
-		for _, one := range supply.Details {
-			supply.MaxSupply = supply.MaxSupply.Add(one.TotalSupply)
-		}
+		supply.MaxSupply = supply.TotalSupply
 	}
 
 	return &supply
@@ -119,10 +115,11 @@ func (c *Currency) tronSupply() *SupplyDetail {
 	return &supply
 }
 
-func (c *Currency) TotalSupply() decimal.Decimal {
+func (c *Currency) TotalSupply() (availableBalance, totalBalance decimal.Decimal) {
 	type TokenDetail struct {
-		TotalIssuance decimal.Decimal `json:"total_issuance"`
-		TokenDecimals int             `json:"token_decimals"`
+		TotalIssuance decimal.Decimal    `json:"total_issuance"`
+		TokenDecimals int                `json:"token_decimals"`
+		AvailableBalance decimal.Decimal `json:"available_balance"`
 	}
 	type SubscanTokenRes struct {
 		Data struct {
@@ -133,7 +130,8 @@ func (c *Currency) TotalSupply() decimal.Decimal {
 	b, _ := util.HttpGet(fmt.Sprintf("%s/api/scan/token", config.Link.SubscanHost))
 	util.UnmarshalAny(&res, b)
 	detail := res.Data.Detail[strings.ToUpper(c.Code)]
-	return detail.TotalIssuance.Div(decimal.New(1, int32(detail.TokenDecimals)))
+	decimals := decimal.New(1, int32(detail.TokenDecimals))
+	return detail.AvailableBalance.Div(decimals), detail.TotalIssuance.Div(decimals)
 }
 
 func (s *SupplyDetail) filterBalance(filterAddress map[string][]string) decimal.Decimal {
