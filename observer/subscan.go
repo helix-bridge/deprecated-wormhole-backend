@@ -66,7 +66,7 @@ func (s *SubscanEvent) pullEvents(o Observable) {
             s.Result = &result
             oldest_scaned = result.BlockNum
             if s.Page == 0 && idx == 0 {
-                s.Latest = result.BlockNum
+                s.Latest = result.BlockNum + 1
                 log.Info("update Latest", "to", s.Latest)
             }
             log.Info("subscan find valid event", "key", key, "event", s.Result)
