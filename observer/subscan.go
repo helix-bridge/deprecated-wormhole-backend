@@ -174,7 +174,7 @@ func (s *SubscanEvent) Process() error {
 		switch s.Result.EventId {
 		case "RedeemDeposit", "RedeemKton", "RedeemRing":
 			for _, param := range s.Result.Params {
-				if strings.EqualFold(param.Type, "EthereumTransactionIndex") {
+				if strings.EqualFold(param.Type, "EthereumTransactionIndex") || strings.EqualFold(param.Type, "Tuple:H256U64") {
 					var t EthereumTransactionIndex
 					util.UnmarshalAny(&t, param.Value)
 					if fromTx := parallel.EthGetTransactionByBlockHashAndIndex(t.BlockHash, util.IntFromInterface(t.Index)); fromTx != "" {
@@ -198,7 +198,7 @@ func (s *SubscanEvent) Process() error {
 			_ = db.CreateTokenBurnRecord(s.Result.ExtrinsicIndex, extrinsic)
 		case "RedeemErc20":
 			for _, param := range s.Result.Params {
-				if strings.EqualFold(param.Type, "EthereumTransactionIndex") {
+				if strings.EqualFold(param.Type, "EthereumTransactionIndex") || strings.EqualFold(param.Type, "Tuple:H256U64") {
 					var t EthereumTransactionIndex
 					util.UnmarshalAny(&t, param.Value)
 					if fromTx := parallel.EthGetTransactionByBlockHashAndIndex(t.BlockHash, util.IntFromInterface(t.Index)); fromTx != "" {
