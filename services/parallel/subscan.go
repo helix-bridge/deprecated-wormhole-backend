@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/darwinia-network/link/config"
 	"github.com/darwinia-network/link/util"
+	"github.com/darwinia-network/link/util/log"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -65,11 +66,13 @@ type SubscanEvent struct {
 
 type EventParam struct {
 	Type  string      `json:"type"`
+	TypeName string   `json:"type_name"`
 	Value interface{} `json:"value"`
 }
 
 type SubscanParams struct {
 	Row       int    `json:"row"`
+	Page      int64    `json:"page"`
 	Call      string `json:"call"`
 	Module    string `json:"module"`
 	FromBlock int64  `json:"from_block"`
@@ -81,11 +84,12 @@ type SubscanLog struct {
 	Data    string `json:"data"`
 }
 
-func SubscanEvents(moduleId, eventId string, startBlock int64) (list []SubscanEvent) {
+func SubscanEvents(moduleId, eventId string, startBlock int64, page int64) (list []SubscanEvent) {
 	var res SubscanEventsRes
 	url := fmt.Sprintf("%s/api/scan/events", config.Link.SubscanHost)
 	p := SubscanParams{
 		Row:       100,
+		Page:      page,
 		Call:      eventId,
 		Module:    moduleId,
 		FromBlock: startBlock,
@@ -94,6 +98,7 @@ func SubscanEvents(moduleId, eventId string, startBlock int64) (list []SubscanEv
 	bp, _ := json.Marshal(p)
 	raw, err := PostWithApiKey(url, bytes.NewReader(bp))
 	if err != nil {
+		log.Error("post subscan event failed", "err", err)
 		return nil
 	}
 	util.UnmarshalAny(&res, raw)
