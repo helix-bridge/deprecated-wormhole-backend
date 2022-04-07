@@ -14,6 +14,8 @@ type SubscanEvent struct {
 	ModuleId string
 	Result   *parallel.SubscanEvent
 	Last     int64 `json:"last"`
+	Page     int64
+	Latest   int64
 	ch chan interface{}
 }
 
@@ -48,65 +50,38 @@ func (s *SubscanEvent) Do(o Observable) error {
 }
 
 func (s *SubscanEvent) LoadData(o Observable, isRely bool) {
-    needSync := func() bool {
-	return isRely == s.RelyOn()
-    }
-
     restartInfo := util.HgetCacheAll("restart")
     subfrom := util.StringToInt64(restartInfo["subfrom"])
-    subto := util.StringToInt64(restartInfo["subto"])
-
     key := s.ModuleId + ":" + s.EventId
-    log.Info("subscan start to load init data", "key", key, "isrely", isRely, "subfrom", subfrom, "subto", subto)
-    count := 0
-    for {
-	if subfrom >= subto {
-	    break
-	}
-	if eventLog := parallel.SubscanEvents(s.ModuleId, s.EventId, subfrom); eventLog != nil {
-        count += len(eventLog)
-        for _, result := range eventLog {
-            s.Result = &result
-            if result.BlockNum >= subfrom {
-                subfrom = result.BlockNum + 1
-            }
-            if result.BlockNum > subto {
-                break
-            }
-            //if result.BlockNum > subfrom {
-            //subfrom = result.BlockNum
-            //}
-            if !needSync() {
-                continue
-            }
-            _ = o.notify(s)
-        }
-        log.Info("scan substrate transactions", "from", subfrom, "to", subto, "key", key);
-	} else {
-	    break
-	}
-	time.Sleep(1000 * time.Millisecond)
-    }
-    log.Info("finish to load data", "key", key, "isrely", isRely, "subfrom", subfrom, "subto", subto, "count", count)
-    s.Last = subto
+    s.Page = 0
+    s.Last = subfrom
+    log.Info("finish to load data", "key", key, "subfrom", subfrom)
 }
 
 func (s *SubscanEvent) pullEvents(o Observable) {
-    old_start := s.Last
     key := s.ModuleId + ":" + s.EventId
-    if eventLog := parallel.SubscanEvents(s.ModuleId, s.EventId, s.Last); eventLog != nil {
-	for _, result := range eventLog {
-	    s.Result = &result
-	    if result.BlockNum >= s.Last {
-		s.Last = result.BlockNum + 1
-	    }
-	    log.Info("subscan find valid event", "key", key, "event", s.Result)
-	    _ = o.notify(s)
-	}
+    oldest_scaned := s.Last
+    if eventLog := parallel.SubscanEvents(s.ModuleId, s.EventId, s.Last, s.Page); eventLog != nil {
+        for idx, result := range eventLog {
+            s.Result = &result
+            oldest_scaned = result.BlockNum
+            if s.Page == 0 && idx == 0 {
+                s.Latest = result.BlockNum
+                log.Info("update Latest", "to", s.Latest)
+            }
+            log.Info("subscan find valid event", "key", key, "event", s.Result)
+            _ = o.notify(s)
+        }
     }
-    if old_start != s.Last {
-	log.Info("set subscan new last", "key", key, "last", s.Last)
-	_ = util.SetCache(key, s.Last, 86400*7)
+    if oldest_scaned == s.Last {
+        s.Page = 0
+        if s.Last != s.Latest {
+            s.Last = s.Latest
+            log.Info("set subscan new last", "key", key, "last", s.Last)
+            _ = util.SetCache(key, s.Last, 86400*7)
+        }
+    } else {
+        s.Page += 1
     }
 }
 
@@ -174,7 +149,7 @@ func (s *SubscanEvent) Process() error {
 		switch s.Result.EventId {
 		case "RedeemDeposit", "RedeemKton", "RedeemRing":
 			for _, param := range s.Result.Params {
-				if strings.EqualFold(param.Type, "EthereumTransactionIndex") || strings.EqualFold(param.Type, "Tuple:H256U64") {
+				if strings.EqualFold(param.Type, "EthereumTransactionIndex") || strings.EqualFold(param.TypeName, "EthereumTransactionIndex") {
 					var t EthereumTransactionIndex
 					util.UnmarshalAny(&t, param.Value)
 					if fromTx := parallel.EthGetTransactionByBlockHashAndIndex(t.BlockHash, util.IntFromInterface(t.Index)); fromTx != "" {
@@ -198,7 +173,7 @@ func (s *SubscanEvent) Process() error {
 			_ = db.CreateTokenBurnRecord(s.Result.ExtrinsicIndex, extrinsic)
 		case "RedeemErc20":
 			for _, param := range s.Result.Params {
-				if strings.EqualFold(param.Type, "EthereumTransactionIndex") || strings.EqualFold(param.Type, "Tuple:H256U64") {
+				if strings.EqualFold(param.Type, "EthereumTransactionIndex") || strings.EqualFold(param.TypeName, "EthereumTransactionIndex") {
 					var t EthereumTransactionIndex
 					util.UnmarshalAny(&t, param.Value)
 					if fromTx := parallel.EthGetTransactionByBlockHashAndIndex(t.BlockHash, util.IntFromInterface(t.Index)); fromTx != "" {
