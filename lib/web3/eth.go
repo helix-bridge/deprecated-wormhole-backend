@@ -37,7 +37,7 @@ type Transaction struct {
 }
 
 func (e *eth) url() string {
-	return util.GetEnv("INFURA", "https://ropsten.infura.io/v3/67fb2d92380a4ff8a2b1ebef24a81a8f")
+	return util.GetEnv("INFURA", "https://mainnet.infura.io/v3/e9c2206f06fb49b393ee18bfed05daf5")
 }
 
 func (e *eth) scan() string {

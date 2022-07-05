@@ -16,15 +16,15 @@ type GormDB struct {
 	*gorm.DB
 	gdbDone bool
 }
-
-func init() {
-	dbPath := GetEnv("MYSQL_HOST", "127.0.0.1")
-	dbUser := GetEnv("MYSQL_USER", "root")
-	dbPass := GetEnv("MYSQL_PASS", "")
-	dbName := GetEnv("MYSQL_DB", "darwinia-dapp")
-	DB = initMysql(dbPath, dbUser, dbPass, dbName)
-	DB.LogMode(false)
-}
+// deprecated
+//func init() {
+//	dbPath := GetEnv("MYSQL_HOST", "127.0.0.1")
+//	dbUser := GetEnv("MYSQL_USER", "root")
+//	dbPass := GetEnv("MYSQL_PASS", "")
+//	dbName := GetEnv("MYSQL_DB", "darwinia-dapp")
+//	DB = initMysql(dbPath, dbUser, dbPass, dbName)
+//	DB.LogMode(false)
+//}
 
 func initMysql(host, user, pass, db string) *gorm.DB {
 	tdb, err := gorm.Open("mysql", user+":"+pass+"@tcp("+host+")/"+db+"?charset=utf8&parseTime=True&loc=Local")

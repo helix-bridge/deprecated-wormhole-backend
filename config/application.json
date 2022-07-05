@@ -1,5 +1,6 @@
 {
   "production": {
+    "ServerHost": "0.0.0.0:8080",
     "EthRingBurn": "0x7550aab5DFda37f646b1a826F27e9D604D8D1579",
     "TronRingBurn": "TDF92kbYFaEa8RAtvYKaeLwnhvULLHeiws",
     "TokenRedeem": "0xea7938985898af7fd945b03b7bc2e405e744e913",
@@ -14,6 +15,7 @@
     "ImplName": "Darwinia"
   },
   "dev": {
+    "ServerHost": "127.0.0.1:8080",
     "EthRingBurn": "0x7550aab5DFda37f646b1a826F27e9D604D8D1579",
     "TronRingBurn": "TDhG8mcJnmRC3oFkn6YoEFtapwv4Z6rNmN",
     "TokenRedeem": "0x49262B932E439271d05634c32978294C7Ea15d0C",

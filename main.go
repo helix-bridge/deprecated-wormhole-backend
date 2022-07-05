@@ -33,7 +33,7 @@ func setupApp() *cli.App {
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			util.GraceShutdown(&http.Server{Addr: ":5333", Handler: setupRouter()})
+			util.GraceShutdown(&http.Server{Addr: config.Link.ServerHost, Handler: setupRouter()})
 			return nil
 		},
 		Commands: []*cli.Command{

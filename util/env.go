@@ -4,7 +4,7 @@ import "os"
 
 
 var(
-	Environment = GetEnv("ENVIRONMENT","dev")
+	Environment = GetEnv("ENVIRONMENT","production")
 )
 
 func GetEnv(key, defaultValue string) string {

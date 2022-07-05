@@ -16,17 +16,19 @@ func Run(server *gin.Engine) {
 	api.GET("/status", func(c *gin.Context) {
 		c.String(200, "OK")
 	})
-	api.GET("ringBurn", ringBurn())
-	api.GET("redeem", redeem())
-	api.GET("mapping/stat", cache.CachePage(store, time.Minute, mappingStat()))
 	api.GET("supply", cache.CachePage(store, time.Minute, ringSupply()))
-	api.GET("ethereumBacking/locks", locks())
-	api.GET("ethereumBacking/lock", lock())
-	api.GET("ethereumBacking/tokenlock", tokenLock())
-	api.GET("ethereumIssuing/register", erc20RegisterResponse())
-	api.GET("ethereumIssuing/burns", erc20TokenBurns())
-	api.POST("/subscribe", subscribe())
-	api.POST("/plo/subscribe", ploSubscribe())
+
+	//api.GET("ringBurn", ringBurn())
+	//api.GET("redeem", redeem())
+	//api.GET("mapping/stat", cache.CachePage(store, time.Minute, mappingStat()))
+	//api.GET("supply", cache.CachePage(store, time.Minute, ringSupply()))
+	//api.GET("ethereumBacking/locks", locks())
+	//api.GET("ethereumBacking/lock", lock())
+	//api.GET("ethereumBacking/tokenlock", tokenLock())
+	//api.GET("ethereumIssuing/register", erc20RegisterResponse())
+	//api.GET("ethereumIssuing/burns", erc20TokenBurns())
+	//api.POST("/subscribe", subscribe())
+	//api.POST("/plo/subscribe", ploSubscribe())
 }
 
 func JsonFormat(data interface{}, code int) map[string]interface{} {
