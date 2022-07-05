@@ -15,9 +15,9 @@ import (
 type Supply struct {
 	CirculatingSupply decimal.Decimal `json:"circulatingSupply"`
 	TotalSupply       decimal.Decimal `json:"totalSupply"`
-	BondLockBalance   decimal.Decimal `json:"bond_lock_balance"`
-	TreasuryLockBalance decimal.Decimal `json:"treasury_lock_balance"`
-	MaxSupply         decimal.Decimal `json:"maxSupply"`
+	BondLockBalance decimal.Decimal `json:"bond_lock_balance"`
+	TreasuryBalance decimal.Decimal `json:"treasury_balance"`
+	MaxSupply       decimal.Decimal `json:"maxSupply"`
 	Details           []*SupplyDetail `json:"details"`
 }
 
@@ -80,7 +80,7 @@ func (c *Currency) supply() *Supply {
 		wg.Done()
 	}()
 	go func() {
-		supply.TreasuryLockBalance = c.TreasuryLock(100, 0, "councilMember")
+		supply.TreasuryBalance = c.TreasuryBalance(100, 0, "system")
 		wg.Done()
 	}()
 	go func() {
@@ -99,7 +99,7 @@ func (c *Currency) supply() *Supply {
 		}
 	}
 
-	supply.CirculatingSupply = supply.TotalSupply.Sub(supply.BondLockBalance).Sub(supply.TreasuryLockBalance).
+	supply.CirculatingSupply = supply.TotalSupply.Sub(supply.BondLockBalance).Sub(supply.TreasuryBalance).
 		Sub(supply.CirculatingSupply)
 	return &supply
 }
@@ -134,7 +134,7 @@ func (c *Currency) tronSupply() *SupplyDetail {
 	return &supply
 }
 
-func (c *Currency) TreasuryLock(pageSize, pageIndex  int64, filter string) (decimal.Decimal)  {
+func (c *Currency) TreasuryBalance(pageSize, pageIndex  int64, filter string) (decimal.Decimal)  {
 	type AccountDetail struct {
 		Balance decimal.Decimal `json:"balance"`
 		BalanceLock decimal.Decimal `json:"balance_lock"`
@@ -162,12 +162,10 @@ func (c *Currency) TreasuryLock(pageSize, pageIndex  int64, filter string) (deci
 
 	for _, a := range res.Data.List{
 		if c.Code == "ring"{
-			token = token.Add(a.BalanceLock)
-		}else{
-			token = token.Add(a.BalanceLock)
+			token = token.Add(a.Balance).Add(a.BalanceLock)
 		}
+		// kton has not treasure
 	}
-
 	return token
 }
 
