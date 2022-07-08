@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/gin-contrib/cache"
+	"github.com/darwinia-network/link/middlewares"
 	"github.com/gin-contrib/cache/persistence"
 	"github.com/gin-gonic/gin"
 	"time"
@@ -11,12 +11,13 @@ func Run(server *gin.Engine) {
 
 	store := persistence.NewInMemoryStore(time.Second)
 	api := server.Group("/api")
-	server.GET("supply/ring", cache.CachePage(store, time.Minute*5, ringSupply()))
-	server.GET("supply/kton", cache.CachePage(store, time.Minute*5, ktonSupply()))
+
+	server.GET("supply/ring", middlewares.PageCache(store, time.Minute*5, ringSupply()))
+	server.GET("supply/kton", middlewares.PageCache(store, time.Minute*5, ktonSupply()))
 	api.GET("/status", func(c *gin.Context) {
 		c.String(200, "OK")
 	})
-	api.GET("supply", cache.CachePage(store, time.Minute, ringSupply()))
+	api.GET("supply", middlewares.PageCache(store, time.Minute, ringSupply()))
 
 	//api.GET("ringBurn", ringBurn())
 	//api.GET("redeem", redeem())
