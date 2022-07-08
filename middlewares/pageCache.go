@@ -20,7 +20,6 @@ type responseCache struct {
 	Data   []byte
 }
 
-
 type cachedWriter struct {
 	gin.ResponseWriter
 	status  int
@@ -84,11 +83,11 @@ func (w *cachedWriter) WriteString(data string) (n int, err error) {
 	return ret, err
 }
 
-func PageCache(store persistence.CacheStore, expire time.Duration, handle gin.HandlerFunc) gin.HandlerFunc  {
+func PageCache(store persistence.CacheStore, expire time.Duration, handle gin.HandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var cache responseCache
 		url := c.Request.URL
-		key := urlCacheKey(space,url.RequestURI())
+		key := urlCacheKey(space, url.RequestURI())
 		if err := store.Get(key, &cache); err != nil {
 			if err != persistence.ErrCacheMiss {
 				logrus.Infoln(err.Error())
@@ -117,20 +116,16 @@ func PageCache(store persistence.CacheStore, expire time.Duration, handle gin.Ha
 	}
 }
 
-
-
 func urlCacheKey(prefix string, u string) string {
 	key := url.QueryEscape(u)
 	if len(key) > 200 {
-	h := sha1.New()
-	io.WriteString(h, u)
-	key = string(h.Sum(nil))
-}
+		h := sha1.New()
+		io.WriteString(h, u)
+		key = string(h.Sum(nil))
+	}
 	var buffer bytes.Buffer
 	buffer.WriteString(prefix)
 	buffer.WriteString(":")
 	buffer.WriteString(key)
 	return buffer.String()
 }
-
-

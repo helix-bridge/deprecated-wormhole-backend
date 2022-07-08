@@ -78,7 +78,7 @@ func (e *eth) Event(v interface{}, start int64, to int64, address string, topic 
 	etherscan := e.scan()
 	toBlock := "latest"
 	if to > start {
-	    toBlock = util.Int64ToString(to)
+		toBlock = util.Int64ToString(to)
 	}
 	q := url.Values{}
 	q.Add("fromBlock", util.Int64ToString(start))

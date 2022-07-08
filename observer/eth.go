@@ -13,51 +13,51 @@ import (
 )
 
 type EthTransaction struct {
-	Last	int64                     `json:"last"`
+	Last    int64                     `json:"last"`
 	Address string                    `json:"address"`
 	Method  []string                  `json:"method"`
 	Result  *parallel.EtherscanResult `json:"result"`
-	ch chan interface{}
+	ch      chan interface{}
 }
 
 func (e *EthTransaction) RelyOn() bool {
-    return VerifyProof == e.Result.Topics[0]
+	return VerifyProof == e.Result.Topics[0]
 }
 
 func (e *EthTransaction) LoadData(o Observable, isRely bool) {
-    needSync := func() bool {
-	return isRely == e.RelyOn()
-    }
+	needSync := func() bool {
+		return isRely == e.RelyOn()
+	}
 
-    restartInfo := util.HgetCacheAll("restart")
-    ethfrom := util.StringToInt64(restartInfo["ethfrom"])
-    ethto := util.StringToInt64(restartInfo["ethto"])
+	restartInfo := util.HgetCacheAll("restart")
+	ethfrom := util.StringToInt64(restartInfo["ethfrom"])
+	ethto := util.StringToInt64(restartInfo["ethto"])
 
-    key := strings.Join(e.Method, ":")
-    log.Info("eth start to load init data", "key", key, "isrely", isRely, "ethfrom", ethfrom, "ethto", ethto)
-    for {
-        if ethfrom >= ethto {
-            break
-        }
-        if eventLog, _ := parallel.EtherscanLog(ethfrom, ethfrom + 102400, e.Address, e.Method...); eventLog != nil {
-            for _, result := range eventLog.Result {
-                e.Result = &result
-                ethfrom = util.U256(result.BlockNumber).Int64()
-                if ethfrom > ethto {
-                    break
-                }
-                if !needSync() {
-                    continue
-                }
-                _ = o.notify(e)
-            }
-        }
-        ethfrom = ethfrom + 102400
-        log.Info("scan eth transactions", "from", ethfrom, "to", ethto, "key", key);
-        time.Sleep(1 * time.Second)
-    }
-    log.Info("finish to load data", "key", key, "isrely", isRely, "ethfrom", ethfrom, "ethto", ethto)
-    e.Last = ethto
+	key := strings.Join(e.Method, ":")
+	log.Info("eth start to load init data", "key", key, "isrely", isRely, "ethfrom", ethfrom, "ethto", ethto)
+	for {
+		if ethfrom >= ethto {
+			break
+		}
+		if eventLog, _ := parallel.EtherscanLog(ethfrom, ethfrom+102400, e.Address, e.Method...); eventLog != nil {
+			for _, result := range eventLog.Result {
+				e.Result = &result
+				ethfrom = util.U256(result.BlockNumber).Int64()
+				if ethfrom > ethto {
+					break
+				}
+				if !needSync() {
+					continue
+				}
+				_ = o.notify(e)
+			}
+		}
+		ethfrom = ethfrom + 102400
+		log.Info("scan eth transactions", "from", ethfrom, "to", ethto, "key", key)
+		time.Sleep(1 * time.Second)
+	}
+	log.Info("finish to load data", "key", key, "isrely", isRely, "ethfrom", ethfrom, "ethto", ethto)
+	e.Last = ethto
 }
 
 func (e *EthTransaction) Do(o Observable) error {
@@ -67,75 +67,74 @@ func (e *EthTransaction) Do(o Observable) error {
 	return e.Redeem()
 }
 
-
 func (e *EthTransaction) pullEvents(o Observable) {
-    old_start := e.Last
-    key := strings.Join(e.Method, ":")
-    if eventLog, _ := parallel.EtherscanLog(e.Last+1, 0, e.Address, e.Method...); eventLog != nil {
-	for _, result := range eventLog.Result {
-	    e.Last = util.U256(result.BlockNumber).Int64()
-	    e.Result = &result
-	    log.Info("eth find valid event", "key", key, "event", e.Result)
-	    _ = o.notify(e)
+	old_start := e.Last
+	key := strings.Join(e.Method, ":")
+	if eventLog, _ := parallel.EtherscanLog(e.Last+1, 0, e.Address, e.Method...); eventLog != nil {
+		for _, result := range eventLog.Result {
+			e.Last = util.U256(result.BlockNumber).Int64()
+			e.Result = &result
+			log.Info("eth find valid event", "key", key, "event", e.Result)
+			_ = o.notify(e)
+		}
 	}
-    }
-    if old_start != e.Last {
-	log.Info("set ethcan new last", "key", key, "last", e.Last)
-	_ = util.SetCache(key, e.Last, 86400*7)
-    }
+	if old_start != e.Last {
+		log.Info("set ethcan new last", "key", key, "last", e.Last)
+		_ = util.SetCache(key, e.Last, 86400*7)
+	}
 }
 
 func (e *EthTransaction) Pause() {
-    e.ch <- true
+	e.ch <- true
 }
 
 func (e *EthTransaction) Resume() {
-    e.ch <- false
+	e.ch <- false
 }
 
 func (e *EthTransaction) ErrorBreak(err error) {
-    e.ch <- err
+	e.ch <- err
 }
 
 func (e *EthTransaction) Listen(o Observable) error {
-    e.ch = make(chan interface{})
-    key := strings.Join(e.Method, ":")
-    if e.Last == 0 {
-        if b := util.GetCache(key); b != nil {
-            e.Last = util.StringToInt64(string(b))
-        } else {
-            e.Last = 8028174
-        }
-    }
-    log.Info("ethscan start listen", "key", key, "last", e.Last)
-    updateInterval := time.Second * time.Duration(15)
-    updateTimer := time.NewTicker(updateInterval)
-    pause := false
-    go func() {
-        for {
-            select {
-            case v := <-e.ch:
-                switch v:= v.(type) {
-                case error:
-                    log.Info("observer has error", "err", v)
-                    break;
-                case bool:
-                    if v {
-                        pause = true
-                        log.Info("ethscan event paused", "key", key, "last", e.Last)
-                    } else {
-                        pause = false
-                        log.Info("ethscan event resumed", "key", key, "last", e.Last)
-                    }
-                }
-            case <-updateTimer.C:
-                if !pause {
-                    e.pullEvents(o)
-                }
-            }
-        }
-    }()
-    return nil
+	e.ch = make(chan interface{})
+	key := strings.Join(e.Method, ":")
+	if e.Last == 0 {
+		if b := util.GetCache(key); b != nil {
+			e.Last = util.StringToInt64(string(b))
+		} else {
+			e.Last = 8028174
+		}
+	}
+	log.Info("ethscan start listen", "key", key, "last", e.Last)
+	updateInterval := time.Second * time.Duration(15)
+	updateTimer := time.NewTicker(updateInterval)
+	pause := false
+	go func() {
+		for {
+			select {
+			case v := <-e.ch:
+				switch v := v.(type) {
+				case error:
+					log.Info("observer has error", "err", v)
+					break
+				case bool:
+					if v {
+						pause = true
+						log.Info("ethscan event paused", "key", key, "last", e.Last)
+					} else {
+						pause = false
+						log.Info("ethscan event resumed", "key", key, "last", e.Last)
+					}
+				}
+			case <-updateTimer.C:
+				if !pause {
+					e.pullEvents(o)
+				}
+			}
+		}
+	}()
+	return nil
 }
 
 // https://github.com/darwinia-network/dj

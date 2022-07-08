@@ -15,9 +15,9 @@ import (
 type Supply struct {
 	CirculatingSupply decimal.Decimal `json:"circulatingSupply"`
 	TotalSupply       decimal.Decimal `json:"totalSupply"`
-	BondLockBalance decimal.Decimal `json:"bond_lock_balance"`
-	TreasuryBalance decimal.Decimal `json:"treasury_balance"`
-	MaxSupply       decimal.Decimal `json:"maxSupply"`
+	BondLockBalance   decimal.Decimal `json:"bond_lock_balance"`
+	TreasuryBalance   decimal.Decimal `json:"treasury_balance"`
+	MaxSupply         decimal.Decimal `json:"maxSupply"`
 	Details           []*SupplyDetail `json:"details"`
 }
 
@@ -90,9 +90,9 @@ func (c *Currency) supply() *Supply {
 	wg.Wait()
 
 	if supply.MaxSupply.IsZero() {
-		if c.Code == "kton"{
+		if c.Code == "kton" {
 			supply.MaxSupply = supply.TotalSupply
-		}else{
+		} else {
 			for _, one := range supply.Details {
 				supply.MaxSupply = supply.MaxSupply.Add(one.TotalSupply)
 			}
@@ -134,22 +134,22 @@ func (c *Currency) tronSupply() *SupplyDetail {
 	return &supply
 }
 
-func (c *Currency) TreasuryBalance(pageSize, pageIndex  int64, filter string) (decimal.Decimal)  {
+func (c *Currency) TreasuryBalance(pageSize, pageIndex int64, filter string) decimal.Decimal {
 	type AccountDetail struct {
-		Balance decimal.Decimal `json:"balance"`
+		Balance     decimal.Decimal `json:"balance"`
 		BalanceLock decimal.Decimal `json:"balance_lock"`
 		KtonBalance decimal.Decimal `json:"kton_balance"`
-		KtonLock decimal.Decimal `json:"kton_lock"`
+		KtonLock    decimal.Decimal `json:"kton_lock"`
 	}
 	type AccountTokenRes struct {
-		Data struct{
-			Count int `json:"count"`
-			List []AccountDetail `json:"list"`
+		Data struct {
+			Count int             `json:"count"`
+			List  []AccountDetail `json:"list"`
 		} `json:"data"`
 	}
 
 	params := make(map[string]interface{})
-	params["row"] =  pageSize
+	params["row"] = pageSize
 	params["page"] = pageIndex
 	params["filter"] = filter
 
@@ -160,8 +160,8 @@ func (c *Currency) TreasuryBalance(pageSize, pageIndex  int64, filter string) (d
 
 	var token decimal.Decimal
 
-	for _, a := range res.Data.List{
-		if c.Code == "ring"{
+	for _, a := range res.Data.List {
+		if c.Code == "ring" {
 			token = token.Add(a.Balance).Add(a.BalanceLock)
 		}
 		// kton has not treasure
@@ -171,8 +171,8 @@ func (c *Currency) TreasuryBalance(pageSize, pageIndex  int64, filter string) (d
 
 func (c *Currency) TotalSupply() (decimal.Decimal, decimal.Decimal) {
 	type TokenDetail struct {
-		TotalIssuance decimal.Decimal `json:"total_issuance"`
-		TokenDecimals int             `json:"token_decimals"`
+		TotalIssuance       decimal.Decimal `json:"total_issuance"`
+		TokenDecimals       int             `json:"token_decimals"`
 		BondedLockedBalance decimal.Decimal `json:"bonded_locked_balance"`
 	}
 	type SubscanTokenRes struct {

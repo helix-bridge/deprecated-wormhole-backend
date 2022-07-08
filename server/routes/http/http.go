@@ -12,8 +12,8 @@ func Run(server *gin.Engine) {
 	store := persistence.NewInMemoryStore(time.Second)
 	api := server.Group("/api")
 
-	server.GET("supply/ring", middlewares.PageCache(store, time.Minute*5, ringSupply()))
-	server.GET("supply/kton", middlewares.PageCache(store, time.Minute*5, ktonSupply()))
+	server.GET("supply/ring", middlewares.PageCache(store, time.Second*10, ringSupply()))
+	server.GET("supply/kton", middlewares.PageCache(store, time.Second*10, ktonSupply()))
 	api.GET("/status", func(c *gin.Context) {
 		c.String(200, "OK")
 	})

@@ -16,6 +16,7 @@ type GormDB struct {
 	*gorm.DB
 	gdbDone bool
 }
+
 // deprecated
 //func init() {
 //	dbPath := GetEnv("MYSQL_HOST", "127.0.0.1")
