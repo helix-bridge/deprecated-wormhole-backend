@@ -11,9 +11,9 @@ import (
 func redeem() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		p := new(struct {
-			Address string `json:"address" binding:"required" form:"address"`
-			Page    int    `json:"page" form:"page"`
-			Row     int    `json:"row" form:"row"`
+			Address   string `json:"address" binding:"required" form:"address"`
+			Page      int    `json:"page" form:"page"`
+			Row       int    `json:"row" form:"row"`
 			Confirmed string `json:"confirmed" form:"confirmed"`
 		})
 		if err := c.ShouldBindQuery(p); err != nil {
@@ -26,7 +26,7 @@ func redeem() gin.HandlerFunc {
 		}
 		list, count := db.RedeemList(p.Address, p.Page, p.Row, p.Confirmed)
 		c.JSON(http.StatusOK, JsonFormat(map[string]interface{}{
-		    "list": list, "count": count,
+			"list": list, "count": count,
 		}, 0))
 	}
 }
@@ -40,9 +40,9 @@ func mappingStat() gin.HandlerFunc {
 func locks() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		p := new(struct {
-			Address string `json:"address" binding:"required" form:"address"`
-			Page    int    `json:"page" form:"page"`
-			Row     int    `json:"row" binding:"required" form:"row"`
+			Address   string `json:"address" binding:"required" form:"address"`
+			Page      int    `json:"page" form:"page"`
+			Row       int    `json:"row" binding:"required" form:"row"`
 			Confirmed string `json:"confirmed" form:"confirmed"`
 		})
 		if err := c.ShouldBindQuery(p); err != nil {
@@ -94,9 +94,9 @@ func erc20RegisterResponse() gin.HandlerFunc {
 func erc20TokenBurns() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		p := new(struct {
-			Sender string `json:"sender" binding:"required" form:"sender"`
-			Page   int    `json:"page" form:"page"`
-			Row    int    `json:"row" binding:"required" form:"row"`
+			Sender    string `json:"sender" binding:"required" form:"sender"`
+			Page      int    `json:"page" form:"page"`
+			Row       int    `json:"row" binding:"required" form:"row"`
 			Confirmed string `json:"confirmed" form:"confirmed"`
 		})
 		if err := c.ShouldBindQuery(p); err != nil {
@@ -118,9 +118,9 @@ func erc20TokenBurns() gin.HandlerFunc {
 func tokenLock() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		p := new(struct {
-			Sender string `json:"sender" binding:"required" form:"sender"`
-			Page   int    `json:"page" form:"page"`
-			Row    int    `json:"row" binding:"required" form:"row"`
+			Sender    string `json:"sender" binding:"required" form:"sender"`
+			Page      int    `json:"page" form:"page"`
+			Row       int    `json:"row" binding:"required" form:"row"`
 			Confirmed string `json:"confirmed" form:"confirmed"`
 		})
 		if err := c.ShouldBindQuery(p); err != nil {
@@ -136,4 +136,3 @@ func tokenLock() gin.HandlerFunc {
 			"list": list, "count": count, "implName": config.Link.ImplName}, 0))
 	}
 }
-

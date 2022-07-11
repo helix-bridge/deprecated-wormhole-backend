@@ -32,29 +32,29 @@ func AddRedeemRecord(chain, tx, address, target, currency string, amount decimal
 }
 
 func RedeemList(address string, page, row int, confirmed string) ([]RedeemRecord, int) {
-    db := util.DB
-    var list []RedeemRecord
-    var count int
-    switch confirmed {
-    case "true":
-        db.Model(RedeemRecord{}).Where("darwinia_tx <> ''").Where("address = ?", address).Count(&count)
-        db.Where("darwinia_tx <> ''").Where("address = ?", address).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
-    case "false":
-        db.Model(RedeemRecord{}).Where("darwinia_tx = ''").Where("address = ?", address).Count(&count)
-        db.Where("darwinia_tx = ''").Where("address = ?", address).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
-    default:
-        db.Model(RedeemRecord{}).Where("address = ?", address).Count(&count)
-        if row > 0 {
-            db.Where("address = ?", address).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
-        } else {
-            db.Model(list).Where("address = ?", address).Order("block_num desc").Find(&list)
-        }
-    }
-    relay_best_blocknum := GetRelayBestBlockNum()
-    for index, value := range list {
-        list[index].IsRelayed = relay_best_blocknum >= uint64(value.BlockNum)
-    }
-    return list, count
+	db := util.DB
+	var list []RedeemRecord
+	var count int
+	switch confirmed {
+	case "true":
+		db.Model(RedeemRecord{}).Where("darwinia_tx <> ''").Where("address = ?", address).Count(&count)
+		db.Where("darwinia_tx <> ''").Where("address = ?", address).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	case "false":
+		db.Model(RedeemRecord{}).Where("darwinia_tx = ''").Where("address = ?", address).Count(&count)
+		db.Where("darwinia_tx = ''").Where("address = ?", address).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	default:
+		db.Model(RedeemRecord{}).Where("address = ?", address).Count(&count)
+		if row > 0 {
+			db.Where("address = ?", address).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+		} else {
+			db.Model(list).Where("address = ?", address).Order("block_num desc").Find(&list)
+		}
+	}
+	relay_best_blocknum := GetRelayBestBlockNum()
+	for index, value := range list {
+		list[index].IsRelayed = relay_best_blocknum >= uint64(value.BlockNum)
+	}
+	return list, count
 }
 
 func UpdateRedeem(tx, darwiniaTx string) {

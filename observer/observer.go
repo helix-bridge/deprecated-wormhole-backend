@@ -52,40 +52,40 @@ func (o *ObservableConcrete) Run() (err error) {
 }
 
 func (o *ObservableConcrete) Pause() {
-    for _, item := range o.observerList {
-	item.Pause()
-    }
+	for _, item := range o.observerList {
+		item.Pause()
+	}
 }
 
 func (o *ObservableConcrete) Resume() {
-    for _, item := range o.observerList {
-	item.Resume()
-    }
+	for _, item := range o.observerList {
+		item.Resume()
+	}
 }
 
 func (o *ObservableConcrete) Monitor() {
-    monitorInterval := time.Second * time.Duration(10)
-    monitorTimer := time.NewTimer(monitorInterval)
-    go func() {
-	for {
-	    select {
-	    case <-monitorTimer.C:
-		restart := util.HgetCache("restart", "restart")
-		if string(restart) == "true" {
-		    o.Pause()
-		    for _, item := range o.observerList {
-			item.LoadData(o, false)
-		    }
-		    for _, item := range o.observerList {
-			item.LoadData(o, true)
-		    }
-		    util.HsetCache("restart", "restart", []byte("false"))
-		    o.Resume()
+	monitorInterval := time.Second * time.Duration(10)
+	monitorTimer := time.NewTimer(monitorInterval)
+	go func() {
+		for {
+			select {
+			case <-monitorTimer.C:
+				restart := util.HgetCache("restart", "restart")
+				if string(restart) == "true" {
+					o.Pause()
+					for _, item := range o.observerList {
+						item.LoadData(o, false)
+					}
+					for _, item := range o.observerList {
+						item.LoadData(o, true)
+					}
+					util.HsetCache("restart", "restart", []byte("false"))
+					o.Resume()
+				}
+				monitorTimer.Reset(monitorInterval)
+			}
 		}
-		monitorTimer.Reset(monitorInterval)
-	    }
-	}
-    }()
+	}()
 }
 
 func Run() {

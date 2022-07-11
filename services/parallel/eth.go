@@ -58,5 +58,5 @@ func EtherscanLog(start, to int64, address string, methods ...string) (*Ethersca
 
 func EthGetTransactionByBlockHashAndIndex(blockHash string, index int) string {
 	w := web3.New("eth")
-	return w.GetTransactionByBlockHashAndIndex(blockHash,index)
+	return w.GetTransactionByBlockHashAndIndex(blockHash, index)
 }

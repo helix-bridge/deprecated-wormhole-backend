@@ -10,13 +10,14 @@ var (
 	SubPool *redis.Pool
 )
 
-func init() {
-	redisHost := GetEnv("REDIS_HOST", "127.0.0.1")
-	redisPort := GetEnv("REDIS_PORT", "6379")
-	redisPassword := GetEnv("REDIS_PASSWORD", "")
-	redisDatabase := GetEnv("REDIS_DATABASE", "0")
-	SubPool = initRedis(redisDatabase, redisPassword, redisHost+":"+redisPort)
-}
+// deprecated
+//func init() {
+//	redisHost := GetEnv("REDIS_HOST", "127.0.0.1")
+//	redisPort := GetEnv("REDIS_PORT", "6379")
+//	redisPassword := GetEnv("REDIS_PASSWORD", "")
+//	redisDatabase := GetEnv("REDIS_DATABASE", "0")
+//	SubPool = initRedis(redisDatabase, redisPassword, redisHost+":"+redisPort)
+//}
 
 func initRedis(database string, password string, server string) *redis.Pool {
 	return &redis.Pool{
