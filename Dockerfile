@@ -1,11 +1,10 @@
-ARG GO_VERSION=1.12.4
+ARG GO_VERSION=1.18.3
 
 FROM golang:${GO_VERSION} as builder
 WORKDIR /go/src/github.com/darwinia-network/link
 
-ENV GO111MODULE=on
 COPY go.mod go.sum ./
-RUN go get -v ./...
+RUN go mod download
 
 COPY . .
 RUN go build -o /link
