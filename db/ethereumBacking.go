@@ -25,7 +25,7 @@ type EthereumLockRecord struct {
 func AddEthereumLockRecord(chain, tx, source, target, sender, receiver string, amount decimal.Decimal, blockNum, blockTimestamp int) error {
 	db := util.DB
 	query := db.Create(&EthereumLockRecord{
-		Chain: chain, Tx: tx, Source: source, Target: target, Sender: sender, Receiver: receiver, Amount: amount, BlockNum: blockNum,
+        Chain: chain, Tx: tx, Source: source, Target: target, Sender: sender, Receiver: receiver, Amount: amount, BlockNum: blockNum,
 		BlockTimestamp: blockTimestamp,
 	})
 	return query.Error
@@ -35,14 +35,14 @@ func EthereumLockList(sender string, page, row int, confirmed string) (list []Et
 
 	switch confirmed {
 	case "true":
-		util.DB.Model(EthereumLockRecord{}).Where("darwinia_tx <> ''").Where("sender = ?", sender).Count(&count)
-		util.DB.Where("darwinia_tx <> ''").Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	    util.DB.Model(EthereumLockRecord{}).Where("darwinia_tx <> ''").Where("sender = ?", sender).Count(&count)
+	    util.DB.Where("darwinia_tx <> ''").Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
 	case "false":
-		util.DB.Model(EthereumLockRecord{}).Where("darwinia_tx = ''").Where("sender = ?", sender).Count(&count)
-		util.DB.Where("darwinia_tx = ''").Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	    util.DB.Model(EthereumLockRecord{}).Where("darwinia_tx = ''").Where("sender = ?", sender).Count(&count)
+	    util.DB.Where("darwinia_tx = ''").Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
 	default:
-		util.DB.Model(EthereumLockRecord{}).Where("sender = ?", sender).Count(&count)
-		util.DB.Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	    util.DB.Model(EthereumLockRecord{}).Where("sender = ?", sender).Count(&count)
+	    util.DB.Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
 	}
 
 	relay_best_blocknum := GetRelayBestBlockNum()
@@ -55,3 +55,4 @@ func EthereumLockList(sender string, page, row int, confirmed string) (list []Et
 func UpdateEthereumLockRecord(tx, darwiniaTx string) {
 	util.DB.Model(EthereumLockRecord{}).Where("tx = ?", tx).Update(EthereumLockRecord{DarwiniaTx: darwiniaTx})
 }
+

@@ -9,40 +9,40 @@ import (
 )
 
 type TokenRegisterRecord struct {
-	ExtrinsicIndex string    `json:"extrinsic_index" gorm:"primary_key;auto_increment:false"`
-	CreatedAt      time.Time `json:"-"`
-	AccountId      string    `json:"account_id"`
-	BlockNum       int       `json:"block_num"`
-	BlockHash      string    `sql:"default: null;size:70" json:"block_hash" `
-	Backing        string    `json:"backing" sql:"default: null;size:100"`
-	Source         string    `json:"source" sql:"default: null;size:100"`
-	Target         string    `json:"target" sql:"default: null;size:100"`
-	BlockTimestamp int       `json:"block_timestamp"`
-	MMRIndex       uint      `json:"mmr_index"`
-	MMRRoot        string    `json:"mmr_root"`
-	Signatures     string    `json:"signatures" sql:"type:text;"`
-	BlockHeader    string    `json:"block_header" sql:"type:text;"`
-	Tx             string    `json:"tx"`
+	ExtrinsicIndex string          `json:"extrinsic_index" gorm:"primary_key;auto_increment:false"`
+	CreatedAt      time.Time       `json:"-"`
+	AccountId      string          `json:"account_id"`
+	BlockNum       int             `json:"block_num"`
+	BlockHash      string          `sql:"default: null;size:70" json:"block_hash" `
+	Backing        string          `json:"backing" sql:"default: null;size:100"`
+	Source         string          `json:"source" sql:"default: null;size:100"`
+	Target         string          `json:"target" sql:"default: null;size:100"`
+	BlockTimestamp int             `json:"block_timestamp"`
+	MMRIndex       uint            `json:"mmr_index"`
+	MMRRoot        string          `json:"mmr_root"`
+	Signatures     string          `json:"signatures" sql:"type:text;"`
+	BlockHeader    string          `json:"block_header" sql:"type:text;"`
+	Tx             string          `json:"tx"`
 }
 
 type TokenBurnRecord struct {
-	ExtrinsicIndex string    `json:"extrinsic_index" gorm:"primary_key;auto_increment:false"`
-	CreatedAt      time.Time `json:"-"`
-	AccountId      string    `json:"account_id"`
-	BlockNum       int       `json:"block_num"`
-	BlockHash      string    `sql:"default: null;size:70" json:"block_hash" `
-	Backing        string    `json:"backing" sql:"default: null;size:100"`
-	Source         string    `json:"source" sql:"default: null;size:100"`
-	Target         string    `json:"target" sql:"default: null;size:100"`
-	Sender         string    `json:"sender" sql:"default: null;size:100"`
-	Recipient      string    `json:"recipient" sql:"default: null;size:100"`
-	Value          string    `json:"value" sql:"default: null;size:100"`
-	BlockTimestamp int       `json:"block_timestamp"`
-	MMRIndex       uint      `json:"mmr_index"`
-	MMRRoot        string    `json:"mmr_root"`
-	Signatures     string    `json:"signatures" sql:"type:text;"`
-	BlockHeader    string    `json:"block_header" sql:"type:text;"`
-	Tx             string    `json:"tx"`
+	ExtrinsicIndex string          `json:"extrinsic_index" gorm:"primary_key;auto_increment:false"`
+	CreatedAt      time.Time       `json:"-"`
+	AccountId      string          `json:"account_id"`
+	BlockNum       int             `json:"block_num"`
+	BlockHash      string          `sql:"default: null;size:70" json:"block_hash" `
+	Backing        string          `json:"backing" sql:"default: null;size:100"`
+	Source         string          `json:"source" sql:"default: null;size:100"`
+	Target         string          `json:"target" sql:"default: null;size:100"`
+	Sender         string          `json:"sender" sql:"default: null;size:100"`
+	Recipient      string          `json:"recipient" sql:"default: null;size:100"`
+	Value          string          `json:"value" sql:"default: null;size:100"`
+	BlockTimestamp int             `json:"block_timestamp"`
+	MMRIndex       uint            `json:"mmr_index"`
+	MMRRoot        string          `json:"mmr_root"`
+	Signatures     string          `json:"signatures" sql:"type:text;"`
+	BlockHeader    string          `json:"block_header" sql:"type:text;"`
+	Tx             string          `json:"tx"`
 }
 
 func CreateTokenRegisterRecord(extrinsicIndex string, detail *parallel.ExtrinsicDetail) error {
@@ -62,8 +62,8 @@ func CreateTokenRegisterRecord(extrinsicIndex string, detail *parallel.Extrinsic
 				return errors.New("invalid register event params length")
 			}
 			record.Backing = util.AddHex(util.ToString(event.Params[1].Value))
-			record.Source = util.AddHex(util.ToString(event.Params[2].Value))
-			record.Target = util.AddHex(util.ToString(event.Params[3].Value))
+			record.Source  = util.AddHex(util.ToString(event.Params[2].Value))
+			record.Target  = util.AddHex(util.ToString(event.Params[3].Value))
 		case "ScheduleMMRRoot":
 			record.MMRIndex = uint(util.StringToInt(util.ToString(event.Params[0].Value)))
 		case "ScheduleMmrRoot":
@@ -100,13 +100,13 @@ func CreateTokenBurnRecord(extrinsicIndex string, detail *parallel.ExtrinsicDeta
 		case "BurnToken":
 			if len(event.Params) < 7 {
 				return errors.New("invalid token burn event params length")
-			}
+            }
 			record.Backing = util.AddHex(util.ToString(event.Params[1].Value))
 			record.Sender = util.AddHex(util.ToString(event.Params[2].Value))
-			record.Recipient = util.AddHex(util.ToString(event.Params[3].Value))
-			record.Source = util.AddHex(util.ToString(event.Params[4].Value))
-			record.Target = util.AddHex(util.ToString(event.Params[5].Value))
-			record.Value = util.AddHex(util.ToString(event.Params[6].Value))
+			record.Recipient  = util.AddHex(util.ToString(event.Params[3].Value))
+			record.Source  = util.AddHex(util.ToString(event.Params[4].Value))
+			record.Target  = util.AddHex(util.ToString(event.Params[5].Value))
+			record.Value  = util.AddHex(util.ToString(event.Params[6].Value))
 		case "ScheduleMMRRoot":
 			record.MMRIndex = uint(util.StringToInt(util.ToString(event.Params[0].Value)))
 		case "ScheduleMmrRoot":
@@ -178,14 +178,14 @@ func TokenBurnRecords(sender string, page, row int, confirmed string) ([]TokenBu
 	var count int
 	switch confirmed {
 	case "true":
-		util.DB.Model(TokenBurnRecord{}).Where("tx <> ''").Where("sender = ?", sender).Count(&count)
-		util.DB.Where("tx <> ''").Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	    util.DB.Model(TokenBurnRecord{}).Where("tx <> ''").Where("sender = ?", sender).Count(&count)
+	    util.DB.Where("tx <> ''").Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
 	case "false":
-		util.DB.Model(TokenBurnRecord{}).Where("tx = ''").Where("sender = ?", sender).Count(&count)
-		util.DB.Where("tx = ''").Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	    util.DB.Model(TokenBurnRecord{}).Where("tx = ''").Where("sender = ?", sender).Count(&count)
+	    util.DB.Where("tx = ''").Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
 	default:
-		util.DB.Model(TokenBurnRecord{}).Where("sender = ?", sender).Count(&count)
-		util.DB.Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	    util.DB.Model(TokenBurnRecord{}).Where("sender = ?", sender).Count(&count)
+	    util.DB.Where("sender = ?", sender).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
 	}
 
 	for index, burned := range list {
@@ -199,3 +199,4 @@ func TokenBurnRecords(sender string, page, row int, confirmed string) ([]TokenBu
 	}
 	return list, count
 }
+

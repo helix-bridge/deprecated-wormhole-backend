@@ -1,8 +1,6 @@
 package db
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"github.com/darwinia-network/link/config"
 	"github.com/darwinia-network/link/services/parallel"
@@ -15,8 +13,6 @@ import (
 type Supply struct {
 	CirculatingSupply decimal.Decimal `json:"circulatingSupply"`
 	TotalSupply       decimal.Decimal `json:"totalSupply"`
-	BondLockBalance   decimal.Decimal `json:"bond_lock_balance"`
-	TreasuryBalance   decimal.Decimal `json:"treasury_balance"`
 	MaxSupply         decimal.Decimal `json:"maxSupply"`
 	Details           []*SupplyDetail `json:"details"`
 }
@@ -47,7 +43,7 @@ func RingSupply() *Supply {
 	}
 	ring.FilterAddress = map[string][]string{
 		"Tron":     {"TDWzV6W1L1uRcJzgg2uKa992nAReuDojfQ", "TSu1fQKFkTv95U312R6E94RMdixsupBZDS", "TTW2Vpr9TCu6gxGZ1yjwqy7R79hEH8iscC"},
-		"Ethereum": {"0x5FD8bCC6180eCd977813465bDd0A76A5a9F88B47", "0xfA4FE04f69F87859fCB31dF3B9469f4E6447921c", "0x7f23e4a473db3d11d11b43d90b34f8a778753e34", "0x7f23e4a473db3d11d11b43d90b34f8a778753e34"},
+		"Ethereum": {"0x5FD8bCC6180eCd977813465bDd0A76A5a9F88B47", "0xfA4FE04f69F87859fCB31dF3B9469f4E6447921c", "0x7f23e4a473db3d11d11b43d90b34f8a778753e34", "0x649fdf6ee483a96e020b889571e93700fbd82d88"},
 	}
 	return ring.supply()
 }
@@ -66,7 +62,7 @@ func (c *Currency) supply() *Supply {
 	var supply Supply
 	supply.MaxSupply = c.MaxSupply // 10 billion
 	wg := sync.WaitGroup{}
-	wg.Add(4)
+	wg.Add(3)
 	go func() {
 		ethSupply := c.ethSupply()
 		supply.CirculatingSupply = supply.CirculatingSupply.Add(ethSupply.CirculatingSupply)
@@ -80,27 +76,16 @@ func (c *Currency) supply() *Supply {
 		wg.Done()
 	}()
 	go func() {
-		supply.TreasuryBalance = c.TreasuryBalance(100, 0, "system")
-		wg.Done()
-	}()
-	go func() {
-		supply.TotalSupply, supply.BondLockBalance = c.TotalSupply()
+		supply.TotalSupply = c.TotalSupply()
 		wg.Done()
 	}()
 	wg.Wait()
-
 	if supply.MaxSupply.IsZero() {
-		if c.Code == "kton" {
-			supply.MaxSupply = supply.TotalSupply
-		} else {
-			for _, one := range supply.Details {
-				supply.MaxSupply = supply.MaxSupply.Add(one.TotalSupply)
-			}
+		for _, one := range supply.Details {
+			supply.MaxSupply = supply.MaxSupply.Add(one.TotalSupply)
 		}
 	}
 
-	supply.CirculatingSupply = supply.TotalSupply.Sub(supply.BondLockBalance).Sub(supply.TreasuryBalance).
-		Sub(supply.CirculatingSupply)
 	return &supply
 }
 
@@ -134,46 +119,10 @@ func (c *Currency) tronSupply() *SupplyDetail {
 	return &supply
 }
 
-func (c *Currency) TreasuryBalance(pageSize, pageIndex int64, filter string) decimal.Decimal {
-	type AccountDetail struct {
-		Balance     decimal.Decimal `json:"balance"`
-		BalanceLock decimal.Decimal `json:"balance_lock"`
-		KtonBalance decimal.Decimal `json:"kton_balance"`
-		KtonLock    decimal.Decimal `json:"kton_lock"`
-	}
-	type AccountTokenRes struct {
-		Data struct {
-			Count int             `json:"count"`
-			List  []AccountDetail `json:"list"`
-		} `json:"data"`
-	}
-
-	params := make(map[string]interface{})
-	params["row"] = pageSize
-	params["page"] = pageIndex
-	params["filter"] = filter
-
-	b, _ := json.Marshal(params)
-	var res AccountTokenRes
-	data, _ := util.PostWithJson(fmt.Sprintf("%s/api/scan/accounts", config.Link.SubscanHost), bytes.NewReader(b))
-	util.UnmarshalAny(&res, data)
-
-	var token decimal.Decimal
-
-	for _, a := range res.Data.List {
-		if c.Code == "ring" {
-			token = token.Add(a.Balance).Add(a.BalanceLock)
-		}
-		// kton has not treasure
-	}
-	return token
-}
-
-func (c *Currency) TotalSupply() (decimal.Decimal, decimal.Decimal) {
+func (c *Currency) TotalSupply() decimal.Decimal {
 	type TokenDetail struct {
-		TotalIssuance       decimal.Decimal `json:"total_issuance"`
-		TokenDecimals       int             `json:"token_decimals"`
-		BondedLockedBalance decimal.Decimal `json:"bonded_locked_balance"`
+		TotalIssuance decimal.Decimal `json:"total_issuance"`
+		TokenDecimals int             `json:"token_decimals"`
 	}
 	type SubscanTokenRes struct {
 		Data struct {
@@ -184,8 +133,7 @@ func (c *Currency) TotalSupply() (decimal.Decimal, decimal.Decimal) {
 	b, _ := util.HttpGet(fmt.Sprintf("%s/api/scan/token", config.Link.SubscanHost))
 	util.UnmarshalAny(&res, b)
 	detail := res.Data.Detail[strings.ToUpper(c.Code)]
-	return detail.TotalIssuance.Div(decimal.New(1, int32(detail.TokenDecimals))),
-		detail.BondedLockedBalance.Div(decimal.New(1, int32(detail.TokenDecimals)))
+	return detail.TotalIssuance.Div(decimal.New(1, int32(detail.TokenDecimals)))
 }
 
 func (s *SupplyDetail) filterBalance(filterAddress map[string][]string) decimal.Decimal {

@@ -11,7 +11,6 @@ import (
 var Link ApplicationConf
 
 type ApplicationConf struct {
-	ServerHost      string
 	EthRingBurn     string
 	TronRingBurn    string
 	TokenRedeem     string
@@ -44,7 +43,6 @@ func LoadConf() {
 	}
 
 	contracts := viper.GetStringMapString(util.Environment)
-	conf.ServerHost = contracts[strings.ToLower("ServerHost")]
 	conf.EthRingBurn = contracts[strings.ToLower("EthRingBurn")]
 	conf.TronRingBurn = contracts[strings.ToLower("TronRingBurn")]
 	conf.TokenRedeem = contracts[strings.ToLower("TokenRedeem")]
