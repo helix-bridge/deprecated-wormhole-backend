@@ -16,11 +16,11 @@ import (
 )
 
 func main() {
-    defer util.CloseDB()
-    if err := setupApp().Run(os.Args); err != nil {
-	_, _ = fmt.Fprintln(os.Stderr, err)
-	os.Exit(1)
-    }
+	defer util.CloseDB()
+	if err := setupApp().Run(os.Args); err != nil {
+		_, _ = fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 }
 
 func setupApp() *cli.App {
@@ -33,17 +33,17 @@ func setupApp() *cli.App {
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			util.GraceShutdown(&http.Server{Addr: ":5333", Handler: setupRouter()})
+			util.GraceShutdown(&http.Server{Addr: config.Link.ServerHost, Handler: setupRouter()})
 			return nil
 		},
 		Commands: []*cli.Command{
 			{
 				Name: "observer",
-				Flags: []cli.Flag {
-					&cli.BoolFlag {
-						Name: "verbose",
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:    "verbose",
 						Aliases: []string{"v"},
-						Usage: "Verbose mode",
+						Usage:   "Verbose mode",
 					},
 				},
 				Action: func(c *cli.Context) error {

@@ -24,7 +24,7 @@ func ringBurn() gin.HandlerFunc {
 		}
 		list, count := db.RingBurnList(p.Address, p.Page, p.Row)
 		c.JSON(http.StatusOK, JsonFormat(map[string]interface{}{
-		    "list": list, "count": count,
+			"list": list, "count": count,
 		}, 0))
 	}
 }
