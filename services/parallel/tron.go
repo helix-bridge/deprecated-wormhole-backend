@@ -26,7 +26,7 @@ func RingTronSupply(contract string) *big.Int {
 func RingTronBalance(contract, address string) *big.Int {
 	w := web3.New("tron")
 	var e TronResponse
-	if _ = w.Call(&e, fmt.Sprintf(util.TrxBase58toHexAddress(contract)), "balanceOf(address)", util.TrimTronHex(address)); len(e.ConstantResult) > 0 {
+	if _ = w.Call(&e, fmt.Sprintf( util.TrxBase58toHexAddress(contract)), "balanceOf(address)", util.TrimTronHex(address)); len(e.ConstantResult) > 0 {
 		return util.U256(e.ConstantResult[0])
 	}
 	return big.NewInt(0)

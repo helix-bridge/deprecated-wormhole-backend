@@ -75,14 +75,14 @@ func DarwiniaBackingLocks(accountId string, page, row int, confirmed string) ([]
 
 	switch confirmed {
 	case "true":
-		util.DB.Model(DarwiniaBackingLock{}).Where("tx <> ''").Where("account_id = ?", accountId).Count(&count)
-		util.DB.Where("tx <> ''").Where("account_id = ?", accountId).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	    util.DB.Model(DarwiniaBackingLock{}).Where("tx <> ''").Where("account_id = ?", accountId).Count(&count)
+	    util.DB.Where("tx <> ''").Where("account_id = ?", accountId).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
 	case "false":
-		util.DB.Model(DarwiniaBackingLock{}).Where("tx = ''").Where("account_id = ?", accountId).Count(&count)
-		util.DB.Where("tx = ''").Where("account_id = ?", accountId).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	    util.DB.Model(DarwiniaBackingLock{}).Where("tx = ''").Where("account_id = ?", accountId).Count(&count)
+	    util.DB.Where("tx = ''").Where("account_id = ?", accountId).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
 	default:
-		util.DB.Model(DarwiniaBackingLock{}).Where("account_id = ?", accountId).Count(&count)
-		util.DB.Where("account_id = ?", accountId).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
+	    util.DB.Model(DarwiniaBackingLock{}).Where("account_id = ?", accountId).Count(&count)
+	    util.DB.Where("account_id = ?", accountId).Order("block_num desc").Offset(page * row).Limit(row).Find(&list)
 	}
 
 	for index, lock := range list {
