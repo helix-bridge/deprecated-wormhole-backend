@@ -20,28 +20,28 @@ type SubscanEvent struct {
 }
 
 func (s *SubscanEvent) RelyOn() bool {
-    switch s.ModuleId {
-    case strings.ToLower("EthereumRelay"):
-	return false
-    case strings.ToLower("EthereumBacking"):
-	switch s.Result.EventId {
-	case "RedeemDeposit", "RedeemKton", "RedeemRing":
-	    return true
-	case "LockKton", "LockRing":
-	    return false
+	switch s.ModuleId {
+	case strings.ToLower("EthereumRelay"):
+		return false
+	case strings.ToLower("EthereumBacking"):
+		switch s.Result.EventId {
+		case "RedeemDeposit", "RedeemKton", "RedeemRing":
+			return true
+		case "LockKton", "LockRing":
+			return false
+		}
+	case strings.ToLower("EthereumRelayAuthorities"), strings.ToLower("EcdsaRelayAuthority"):
+		return true
+	case strings.ToLower("EthereumIssuing"):
+		switch s.Result.EventId {
+		case "TokenRegisterFinished":
+			return false
+		case "BurnToken":
+			return false
+		case "RedeemErc20":
+			return true
+		}
 	}
-    case strings.ToLower("EthereumRelayAuthorities"):
-	return true
-    case strings.ToLower("EthereumIssuing"):
-	switch s.Result.EventId {
-	case "TokenRegisterFinished":
-	    return false
-	case "BurnToken":
-	    return false
-	case "RedeemErc20":
-	    return true
-	}
-    }
     return false
 }
 
@@ -163,7 +163,7 @@ func (s *SubscanEvent) Process() error {
 			extrinsic := parallel.SubscanExtrinsic(s.Result.ExtrinsicIndex)
 			_ = db.CreateDarwiniaBacking(s.Result.ExtrinsicIndex, extrinsic)
 		}
-	case strings.ToLower("EthereumRelayAuthorities"):
+	case strings.ToLower("EthereumRelayAuthorities"), strings.ToLower("EcdsaRelayAuthority"):
 		_ = db.MMRRootSigned(s.Result.Params)
 		_ = db.MMRRootSignedForTokenRegistration(s.Result.Params)
 	case strings.ToLower("EthereumIssuing"):

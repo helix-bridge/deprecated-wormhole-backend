@@ -48,6 +48,8 @@ func CreateDarwiniaBacking(extrinsicIndex string, detail *parallel.ExtrinsicDeta
 			record.KtonValue = util.DecimalFromInterface(event.Params[3].Value)
 		case "ScheduleMMRRoot":
 			record.MMRIndex = uint(util.StringToInt(util.ToString(event.Params[0].Value)))
+		case "ScheduleMmrRoot":
+			record.MMRIndex = uint(util.StringToInt(util.ToString(event.Params[0].Value)))
 		}
 	}
 	if record.MMRIndex == 0 {

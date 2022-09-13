@@ -66,6 +66,8 @@ func CreateTokenRegisterRecord(extrinsicIndex string, detail *parallel.Extrinsic
 			record.Target  = util.AddHex(util.ToString(event.Params[3].Value))
 		case "ScheduleMMRRoot":
 			record.MMRIndex = uint(util.StringToInt(util.ToString(event.Params[0].Value)))
+		case "ScheduleMmrRoot":
+			record.MMRIndex = uint(util.StringToInt(util.ToString(event.Params[0].Value)))
 		}
 	}
 	if record.MMRIndex == 0 {
@@ -106,6 +108,8 @@ func CreateTokenBurnRecord(extrinsicIndex string, detail *parallel.ExtrinsicDeta
 			record.Target  = util.AddHex(util.ToString(event.Params[5].Value))
 			record.Value  = util.AddHex(util.ToString(event.Params[6].Value))
 		case "ScheduleMMRRoot":
+			record.MMRIndex = uint(util.StringToInt(util.ToString(event.Params[0].Value)))
+		case "ScheduleMmrRoot":
 			record.MMRIndex = uint(util.StringToInt(util.ToString(event.Params[0].Value)))
 		}
 	}
