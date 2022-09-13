@@ -30,7 +30,7 @@ func (s *SubscanEvent) RelyOn() bool {
 	case "LockKton", "LockRing":
 	    return false
 	}
-    case strings.ToLower("EthereumRelayAuthorities"):
+    case strings.ToLower("EthereumRelayAuthorities"), strings.ToLower("EcdsaRelayAuthority"):
 	return true
     case strings.ToLower("EthereumIssuing"):
 	switch s.Result.EventId {
@@ -55,6 +55,7 @@ func (s *SubscanEvent) LoadData(o Observable, isRely bool) {
     key := s.ModuleId + ":" + s.EventId
     s.Page = 0
     s.Last = subfrom
+    s.Latest = s.Last
     log.Info("finish to load data", "key", key, "subfrom", subfrom)
 }
 
@@ -103,6 +104,7 @@ func (s *SubscanEvent) Listen(o Observable) error {
     if s.Last == 0 {
         if b := util.GetCache(key); b != nil {
             s.Last = util.StringToInt64(string(b))
+            s.Latest = s.Last
         }
     }
     log.Info("subscan start listen", "key", key, "last", s.Last)
@@ -161,7 +163,7 @@ func (s *SubscanEvent) Process() error {
 			extrinsic := parallel.SubscanExtrinsic(s.Result.ExtrinsicIndex)
 			_ = db.CreateDarwiniaBacking(s.Result.ExtrinsicIndex, extrinsic)
 		}
-	case strings.ToLower("EthereumRelayAuthorities"):
+	case strings.ToLower("EthereumRelayAuthorities"), strings.ToLower("EcdsaRelayAuthority"):
 		_ = db.MMRRootSigned(s.Result.Params)
 		_ = db.MMRRootSignedForTokenRegistration(s.Result.Params)
 	case strings.ToLower("EthereumIssuing"):
