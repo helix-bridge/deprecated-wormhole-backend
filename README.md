@@ -1,12 +1,12 @@
 ## Link
 
-Darwinia dApp Support
+Darwinia dApp Support 
 
 ### require
 
-1. golang >= 1.18.1
-1. mysql >= 5.6
-1. redis
+1. golang >= 1.12.4
+1. mysql >= 5.6 
+1. redis 
 
 ### usage
 
@@ -21,7 +21,7 @@ VERSION:
    0.1
 
 COMMANDS:
-     observer
+     observer  
      help, h   Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
@@ -43,7 +43,7 @@ go run main.go
 ```
 
 
-### docker
+### docker 
 
 ```shell script
 docker-compose up -d

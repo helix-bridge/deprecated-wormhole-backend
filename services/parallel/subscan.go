@@ -65,14 +65,14 @@ type SubscanEvent struct {
 }
 
 type EventParam struct {
-	Type     string      `json:"type"`
-	TypeName string      `json:"type_name"`
-	Value    interface{} `json:"value"`
+	Type  string      `json:"type"`
+	TypeName string   `json:"type_name"`
+	Value interface{} `json:"value"`
 }
 
 type SubscanParams struct {
 	Row       int    `json:"row"`
-	Page      int64  `json:"page"`
+	Page      int64    `json:"page"`
 	Call      string `json:"call"`
 	Module    string `json:"module"`
 	FromBlock int64  `json:"from_block"`
